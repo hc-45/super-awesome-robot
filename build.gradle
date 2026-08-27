@@ -114,8 +114,8 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
+project.compileJava.dependsOn(spotlessApply)
 spotless {
-    enforceCheck = false
     java {
         targetExclude("src/main/java/com/stuypulse/robot/commands/autons/*.java")
         
@@ -125,7 +125,7 @@ spotless {
 /**************************************************************/
 """).updateYearWithLatest(false)
 
-        googleJavaFormat().aosp()
+        leadingTabsToSpaces(4)
         
         trimTrailingWhitespace()
         endWithNewline()

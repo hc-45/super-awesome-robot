@@ -1,11 +1,11 @@
-/************************ PROJECT PHIL ************************/
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
 /* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
 /* This work is licensed under the terms of the MIT license.  */
 /**************************************************************/
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.auton.AutonomousRoutines;
-import com.stuypulse.robot.constants.Ports;
+import com.stuypulse.robot.constants.GlobalPorts;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.button.CommandNiDsXboxController;
@@ -19,9 +19,9 @@ public class RobotContainer {
 
     // Gamepads
     public final CommandNiDsXboxController driver =
-            new CommandNiDsXboxController(Ports.Gamepad.DRIVER);
+            new CommandNiDsXboxController(GlobalPorts.Gamepad.DRIVER);
     public final CommandNiDsXboxController operator =
-            new CommandNiDsXboxController(Ports.Gamepad.OPERATOR);
+            new CommandNiDsXboxController(GlobalPorts.Gamepad.OPERATOR);
 
     // Subsystem
 

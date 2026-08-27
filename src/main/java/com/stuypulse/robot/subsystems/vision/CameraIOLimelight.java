@@ -1,17 +1,9 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
@@ -22,8 +14,14 @@ import org.wpilib.networktables.DoubleSubscriber;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.system.RobotController;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+
 /** IO implementation for real Limelight hardware. */
-public class VisionIOLimelight implements VisionIO {
+public class CameraIOLimelight implements CameraIO {
     private final Supplier<Rotation2d> rotationSupplier;
     private final DoubleArrayPublisher orientationPublisher;
 
@@ -40,7 +38,7 @@ public class VisionIOLimelight implements VisionIO {
      * @param rotationSupplier Supplier for the current estimated rotation, used for
      *                         MegaTag 2.
      */
-    public VisionIOLimelight(String name, Supplier<Rotation2d> rotationSupplier) {
+    public CameraIOLimelight(String name, Supplier<Rotation2d> rotationSupplier) {
         var table = NetworkTableInstance.getDefault().getTable(name);
         this.rotationSupplier = rotationSupplier;
         orientationPublisher = table.getDoubleArrayTopic("robot_orientation_set").publish();
@@ -52,7 +50,7 @@ public class VisionIOLimelight implements VisionIO {
     }
 
     @Override
-    public void updateInputs(VisionIOInputs inputs) {
+    public void updateInputs(CameraIOInputs inputs) {
         // Update connection status based on whether an update has been seen in the last
         // 250ms
         inputs.connected = ((RobotController.getMonotonicTime() - latencySubscriber.getLastChange()) / 1000) < 250;

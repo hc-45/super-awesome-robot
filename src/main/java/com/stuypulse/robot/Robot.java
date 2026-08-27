@@ -1,8 +1,10 @@
-/************************ PROJECT PHIL ************************/
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
 /* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
 /* This work is licensed under the terms of the MIT license.  */
 /**************************************************************/
 package com.stuypulse.robot;
+
+import com.stuypulse.robot.util.FullSubsystem;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
@@ -50,6 +52,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         defaultScheduler.run();
+        FullSubsystem.runAllPeriodicAfterScheduler();
     }
 
     /*********************/

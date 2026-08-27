@@ -1,12 +1,16 @@
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.util.talonfx.sim;
 
 import static org.wpilib.units.Units.*;
-import org.wpilib.units.measure.*;
 
 import org.wpilib.simulation.DCMotorSim;
 import org.wpilib.simulation.ElevatorSim;
 import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.simulation.SingleJointedArmSim;
+import org.wpilib.units.measure.*;
 
 /**
  *

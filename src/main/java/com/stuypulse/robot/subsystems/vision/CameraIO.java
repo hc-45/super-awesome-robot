@@ -1,19 +1,17 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
-import org.littletonrobotics.junction.AutoLog;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
 
-public interface VisionIO {
+import org.littletonrobotics.junction.AutoLog;
+
+public interface CameraIO {
     @AutoLog
-    public static class VisionIOInputs {
+    public static class CameraIOInputs {
         public boolean connected = false;
         public TargetObservation latestTargetObservation = new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
         public PoseObservation[] poseObservations = new PoseObservation[0];
@@ -40,6 +38,6 @@ public interface VisionIO {
         PHOTONVISION
     }
 
-    public default void updateInputs(VisionIOInputs inputs) {
+    public default void updateInputs(CameraIOInputs inputs) {
     }
 }

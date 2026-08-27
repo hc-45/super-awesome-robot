@@ -1,4 +1,11 @@
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.util;
+
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.util.Pair;
 
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -6,8 +13,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinder;
-import org.wpilib.math.util.Pair;
-import org.wpilib.math.geometry.Translation2d;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

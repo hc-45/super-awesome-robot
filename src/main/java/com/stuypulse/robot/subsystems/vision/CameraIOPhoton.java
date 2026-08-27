@@ -1,25 +1,23 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
-import static com.stuypulse.robot.subsystems.vision.VisionConstants.*;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Transform3d;
+
+import com.stuypulse.robot.subsystems.vision.VisionConstants.VisionSettings;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.photonvision.PhotonCamera;
-import org.wpilib.math.geometry.Pose3d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.geometry.Transform3d;
 
 /** IO implementation for real PhotonVision hardware. */
-public class VisionIOPhotonVision implements VisionIO {
+public class CameraIOPhoton implements CameraIO {
     protected final PhotonCamera camera;
     protected final Transform3d robotToCamera;
 
@@ -29,13 +27,13 @@ public class VisionIOPhotonVision implements VisionIO {
      * @param name          The configured name of the camera.
      * @param robotToCamera The 3D position of the camera relative to the robot.
      */
-    public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
+    public CameraIOPhoton(String name, Transform3d robotToCamera) {
         camera = new PhotonCamera(name);
         this.robotToCamera = robotToCamera;
     }
 
     @Override
-    public void updateInputs(VisionIOInputs inputs) {
+    public void updateInputs(CameraIOInputs inputs) {
         inputs.connected = camera.isConnected();
 
         // Read new camera observations
@@ -83,7 +81,7 @@ public class VisionIOPhotonVision implements VisionIO {
                 var target = result.targets.get(0);
 
                 // Calculate robot pose
-                var tagPose = aprilTagLayout.getTagPose(target.fiducialId);
+                var tagPose = VisionSettings.APRILTAG_LAYOUT.getTagPose(target.fiducialId);
                 if (tagPose.isPresent()) {
                     Transform3d fieldToTarget = new Transform3d(tagPose.get().getTranslation(),
                             tagPose.get().getRotation());

@@ -1,43 +1,41 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
 import static com.stuypulse.robot.subsystems.vision.VisionConstants.*;
 
-import com.stuypulse.robot.subsystems.vision.VisionIO.PoseObservationType;
-import java.util.LinkedList;
-import java.util.List;
-import org.littletonrobotics.junction.Logger;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.linalg.VecBuilder;
+import com.stuypulse.robot.subsystems.vision.CameraIO.PoseObservationType;
+import com.stuypulse.robot.util.FullSubsystem;
+
+import org.wpilib.driverstation.Alert;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
-import org.wpilib.driverstation.Alert;
 
-import com.stuypulse.robot.util.FullSubsystem;
+import java.util.LinkedList;
+import java.util.List;
+import org.littletonrobotics.junction.Logger;
 
 public class Vision extends FullSubsystem {
     private final VisionConsumer consumer;
-    private final VisionIO[] io;
-    private final VisionIOInputsAutoLogged[] inputs;
+    private final CameraIO[] io;
+    private final CameraIOInputsAutoLogged[] inputs;
     private final Alert[] disconnectedAlerts;
 
-    public Vision(VisionConsumer consumer, VisionIO... io) {
+    public Vision(VisionConsumer consumer, CameraIO... io) {
         this.consumer = consumer;
         this.io = io;
 
         // Initialize inputs
-        this.inputs = new VisionIOInputsAutoLogged[io.length];
+        this.inputs = new CameraIOInputsAutoLogged[io.length];
         for (int i = 0; i < inputs.length; i++) {
-            inputs[i] = new VisionIOInputsAutoLogged();
+            inputs[i] = new CameraIOInputsAutoLogged();
         }
 
         // Initialize disconnected alerts
@@ -84,7 +82,7 @@ public class Vision extends FullSubsystem {
 
             // Add tag poses
             for (int tagId : inputs[cameraIndex].tagIds) {
-                var tagPose = aprilTagLayout.getTagPose(tagId);
+                var tagPose = VisionSettings.APRILTAG_LAYOUT.getTagPose(tagId);
                 if (tagPose.isPresent()) {
                     tagPoses.add(tagPose.get());
                 }
@@ -95,14 +93,14 @@ public class Vision extends FullSubsystem {
                 // Check whether to reject pose
                 boolean rejectPose = observation.tagCount() == 0 // Must have at least one tag
                         || (observation.tagCount() == 1
-                                && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
-                        || Math.abs(observation.pose().getZ()) > maxZError // Must have realistic Z coordinate
+                                && observation.ambiguity() > VisionSettings.MAX_AMBIGUITY) // Cannot be high ambiguity
+                        || Math.abs(observation.pose().getZ()) > VisionSettings.MAX_Z_ERROR // Must have realistic Z coordinate
 
                         // Must be within the field boundaries
                         || observation.pose().getX() < 0.0
-                        || observation.pose().getX() > aprilTagLayout.getFieldLength()
+                        || observation.pose().getX() > VisionSettings.APRILTAG_LAYOUT.getFieldLength()
                         || observation.pose().getY() < 0.0
-                        || observation.pose().getY() > aprilTagLayout.getFieldWidth();
+                        || observation.pose().getY() > VisionSettings.APRILTAG_LAYOUT.getFieldWidth();
 
                 // Add pose to log
                 robotPoses.add(observation.pose());
@@ -119,11 +117,11 @@ public class Vision extends FullSubsystem {
 
                 // Calculate standard deviations
                 double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-                double linearStdDev = linearStdDevBaseline * stdDevFactor;
-                double angularStdDev = angularStdDevBaseline * stdDevFactor;
+                double linearStdDev = VisionSettings.LINEAR_STD_DEV_BASELINE * stdDevFactor;
+                double angularStdDev = VisionSettings.ANGULAR_STD_DEV_BASELINE * stdDevFactor;
                 if (observation.type() == PoseObservationType.MEGATAG_2) {
-                    linearStdDev *= linearStdDevMegatag2Factor;
-                    angularStdDev *= angularStdDevMegatag2Factor;
+                    linearStdDev *= VisionSettings.LINEAR_STD_DEV_MEGATAG2_FACTOR;
+                    angularStdDev *= VisionSettings.ANGULAR_STD_DEV_MEGATAG2_FACTOR;
                 }
                 if (cameraIndex < cameraStdDevFactors.length) {
                     linearStdDev *= cameraStdDevFactors[cameraIndex];

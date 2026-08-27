@@ -1,15 +1,14 @@
-// Copyright (c) 2025-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by an MIT-style
-// license that can be found in the LICENSE file at
-// the root directory of this project.
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.util;
+
+import org.wpilib.command3.Mechanism;
+import org.wpilib.command3.Scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.wpilib.command3.Scheduler;
 
 /**
  * A standard subsystem that includes an extra periodic callback which runs
@@ -17,30 +16,37 @@ import org.wpilib.command3.Scheduler;
  * scheduler. Allows outputs to be published after all other periodic code has
  * finished.
  */
-public abstract class FullSubsystem {
-    private static List<FullSubsystem> instances = new ArrayList<>();
+public abstract class FullSubsystem extends Mechanism {
+    private static final List<FullSubsystem> subsystemInstances = new ArrayList<>();
     private static final Scheduler DEFAULT_SCHEDULER = Scheduler.getDefault();
 
     protected FullSubsystem() {
-        instances.add(this);
+        super();
+        subsystemInstances.add(this);
+        DEFAULT_SCHEDULER.addPeriodic(this::periodic);
+    }
+
+    protected FullSubsystem(String name) {
+        super(name);
+        subsystemInstances.add(this);
         DEFAULT_SCHEDULER.addPeriodic(this::periodic);
     }
 
     /**
-     * This method is called periodically after the command scheduler, and should be
+     * This method is called periodically after {@link Scheduler#run}, and should be
      * overriden for applying outputs.
      */
-    public void periodicAfterScheduler() {};
+    protected void periodicAfterScheduler() {};
 
     /**
-     * This method is called periodically before the command scheduler, and should be
+     * This method is called periodically before {@link Scheduler#run}, and should be
      * overriden for processing inputs.
      */
-    public abstract void periodic();
+    protected abstract void periodic();
 
-    /** Run the "after periodic" methods for all subsystems. */
+    /** Run the {@link #periodicAfterScheduler} methods for all subsystems. */
     public static void runAllPeriodicAfterScheduler() {
-        for (FullSubsystem instance : instances) {
+        for (FullSubsystem instance : subsystemInstances) {
             instance.periodicAfterScheduler();
         }
     }

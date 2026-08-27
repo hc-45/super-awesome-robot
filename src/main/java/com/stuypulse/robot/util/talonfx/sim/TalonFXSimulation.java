@@ -1,19 +1,18 @@
-/************************* PROJECT RON *************************/
-/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
-/* Use of this source code is governed by an MIT-style license */
-/* that can be found in the repository LICENSE file.           */
-/***************************************************************/
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.util.talonfx.sim;
+
+import com.stuypulse.robot.util.talonfx.TalonFXConfig;
+
+import org.wpilib.system.RobotController;
+import org.wpilib.units.measure.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import com.stuypulse.robot.util.talonfx.TalonFXConfig;
-
-import org.wpilib.units.measure.*;
-
-import org.wpilib.system.RobotController;
 
 /**
  *
