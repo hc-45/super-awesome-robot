@@ -11,41 +11,49 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.stuypulse.robot.subsystems.claw.ClawConstants.ClawSettings;
 
-public class ClawIOBase implements ClawIO {
-    private final TalonFX gripperMotor;
+// intentionally package private
+abstract sealed class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalonFX {
     private final TalonFX rollerMotor;
     private final TalonFX pivotMotor;
 
-    private final VoltageOut voltageController;
     private final MotionMagicVoltage motionProfileController;
     private final DutyCycleOut rollerDutyCycleController;
 
     private final StatusSignal<Current> pivotMotorSupplyCurrent;
     private final StatusSignal<Current> pivotMotorStatorCurrent;
     private final StatusSignal<Angle> pivotMotorPosition;
-    private final StatusSignal<Voltage> pivotMotorVoltage;
     private final StatusSignal<Boolean> pivotMotorMotionMagicAtTarget;
+    private final StatusSignal<Voltage> pivotMotorVoltage;
+
+    private final StatusSignal<Current> rollerMotorSupplyCurrent;
+    private final StatusSignal<Current> rollerMotorStatorCurrent;
+    private final StatusSignal<Temperature> rollerMotorTemperature;
+    private final StatusSignal<AngularVelocity> rollerMotorAngularVelocity;
+    private final StatusSignal<Voltage> rollerMotorVoltage;
     
-    public ClawIOBase(final TalonFX gripperMotor, final TalonFX rollerMotor, final TalonFX pivotMotor) {
-        this.gripperMotor = gripperMotor;
+    public ClawIOBase(final TalonFX rollerMotor, final TalonFX pivotMotor) {
         this.rollerMotor = rollerMotor;
         this.pivotMotor = pivotMotor;
 
-        this.voltageController = new VoltageOut(ClawSettings.Gripper.IDLE_VOLTAGE);
-        this.motionProfileController = new MotionMagicVoltage(ClawSettings.Gripper.OPEN_ANGLE);
+        this.motionProfileController = new MotionMagicVoltage(ClawSettings.Pivot.INTAKE_ANGLE);
         this.rollerDutyCycleController = new DutyCycleOut(ClawSettings.Rollers.IDLE_DUTY_CYCLE);
 
+        // pivot signals
         this.pivotMotorSupplyCurrent = this.pivotMotor.getSupplyCurrent();
         this.pivotMotorStatorCurrent = this.pivotMotor.getStatorCurrent();
         this.pivotMotorPosition = this.pivotMotor.getPosition();
-        this.pivotMotorVoltage = this.pivotMotor.getMotorVoltage(true);
+        this.pivotMotorVoltage = this.pivotMotor.getMotorVoltage();
         this.pivotMotorMotionMagicAtTarget = this.pivotMotor.getMotionMagicAtTarget();
 
-        // todo: gripper & roller input sognals
+        // roller signals
+        this.rollerMotorSupplyCurrent = this.rollerMotor.getSupplyCurrent();
+        this.rollerMotorStatorCurrent = this.rollerMotor.getStatorCurrent();
+        this.rollerMotorTemperature = this.rollerMotor.getDeviceTemp();
+        this.rollerMotorAngularVelocity = this.rollerMotor.getVelocity();
+        this.rollerMotorVoltage = this.rollerMotor.getMotorVoltage();
     }
 
     @Override
@@ -58,18 +66,33 @@ public class ClawIOBase implements ClawIO {
         inputs.pivotMotorVoltage = this.pivotMotorVoltage.getValue();
         inputs.pivotMotorMotionMagicAtTarget = this.pivotMotorMotionMagicAtTarget.getValue();
 
+        inputs.rollerMotorSupplyCurrent = this.rollerMotorSupplyCurrent.getValue();
+        inputs.rollerMotorStatorCurrent = this.rollerMotorStatorCurrent.getValue();
+        inputs.rollerMotorTemperature = this.rollerMotorTemperature.getValue();
+        inputs.rollerMotorAngularVelocity = this.rollerMotorAngularVelocity.getValue();
+        inputs.rollerMotorVoltage = this.rollerMotorVoltage.getValue();
         return refreshStatusCode;
     }
 
     @Override
-    public StatusCode applyOutputs(ClawOutputs outputs) {
-        return switch (outputs.gripperOutputMode) {
+    public StatusCode applyPivotOutputs(final PivotOutputs outputs) {
+        return switch (outputs.pivotOutputMode) {
             case IDLE -> {
-                gripperMotor.stopMotor(); 
+                pivotMotor.stopMotor(); 
                 yield StatusCode.OK;
             }
-            case VOLTAGE -> gripperMotor.setControl(voltageController.withOutput(outputs.gripperTargetVoltage));
-            case MOTION_MAGIC -> gripperMotor.setControl(motionProfileController.withPosition(outputs.gripperProfileSetpoint));
+            case MOTION_MAGIC -> pivotMotor.setControl(motionProfileController.withPosition(outputs.pivotProfileSetpoint));
+        };
+    }
+
+    @Override
+    public StatusCode applyRollerOutputs(final RollerOutputs outputs) {
+        return switch (outputs.rollerOutputMode) {
+            case IDLE -> {
+                rollerMotor.stopMotor(); 
+                yield StatusCode.OK;
+            }
+            case DUTY_CYCLE -> rollerMotor.setControl(rollerDutyCycleController.withOutput(outputs.rollerTargetDutyCycle));
         };
     }
 }

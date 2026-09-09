@@ -9,45 +9,59 @@ import static org.wpilib.units.Units.*;
 import org.wpilib.units.measure.*;
 
 import com.ctre.phoenix6.StatusCode;
+
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public interface ClawIO {
     @AutoLog
     class ClawInputs {
-        public Current rollerMotorSupplyCurrent = Amps.zero();
-        public Current rollerMotorStatorCurrent = Amps.zero();
-        public Temperature rollerMotorTemperature = Celsius.zero();
-        public AngularVelocity rollerMotorVelocity = RotationsPerSecond.zero();
-        public Voltage rollerMotorAppliedVoltage = Volts.zero();
-
         public Current pivotMotorSupplyCurrent = Amps.zero();
         public Current pivotMotorStatorCurrent = Amps.zero();
         public Angle pivotMotorPosition = Rotations.zero();
         public boolean pivotMotorMotionMagicAtTarget = false;
         public Voltage pivotMotorVoltage = Volts.zero();
+
+        public Current rollerMotorSupplyCurrent = Amps.zero();
+        public Current rollerMotorStatorCurrent = Amps.zero();
+        public Temperature rollerMotorTemperature = Celsius.zero();
+        public AngularVelocity rollerMotorAngularVelocity = RotationsPerSecond.zero();
+        public Voltage rollerMotorVoltage = Volts.zero();
     }
 
-    enum GripperOutputMode {
+    enum PivotOutputMode {
         IDLE,
-        VOLTAGE,
         MOTION_MAGIC;
     }
 
-    class ClawOutputs {
-        @AutoLogOutput(key = "Claw/Gripper/Output Mode")
-        public GripperOutputMode gripperOutputMode = GripperOutputMode.VOLTAGE;
-        @AutoLogOutput(key = "Claw/Gripper/Target Voltage")
-        public Voltage gripperTargetVoltage = Volts.zero();
-        @AutoLogOutput(key = "Claw/Gripper/Profile Setpoint")
-        public Angle gripperProfileSetpoint = Rotations.zero();
+    enum RollerOutputMode {
+        IDLE,
+        DUTY_CYCLE;
     }
 
-    default StatusCode updateInputs(ClawInputs inputs) {
+    class PivotOutputs {
+        @AutoLogOutput(key = "Claw/Pivot/Output Mode")
+        public PivotOutputMode pivotOutputMode = PivotOutputMode.IDLE;
+        @AutoLogOutput(key = "Claw/Pivot/Profile Setpoint")
+        public Angle pivotProfileSetpoint = Rotations.zero();
+    }
+
+    class RollerOutputs {
+        @AutoLogOutput(key = "Claw/Rollers/Output Mode")
+        public RollerOutputMode rollerOutputMode = RollerOutputMode.IDLE;
+        @AutoLogOutput(key = "Claw/Rollers/Target Duty Cycle")
+        public double rollerTargetDutyCycle = 0.0;
+    }
+
+    default StatusCode updateInputs(final ClawInputs inputs) {
         return StatusCode.OK;
     }
 
-    default StatusCode applyOutputs(ClawOutputs outputs) {
+    default StatusCode applyPivotOutputs(final PivotOutputs outputs) {
+        return StatusCode.OK;
+    }
+
+    default StatusCode applyRollerOutputs(final RollerOutputs outputs) {
         return StatusCode.OK;
     }
 }

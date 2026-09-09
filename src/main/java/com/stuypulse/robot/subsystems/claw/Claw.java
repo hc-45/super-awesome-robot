@@ -6,8 +6,10 @@ package com.stuypulse.robot.subsystems.claw;
 
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.subsystems.claw.ClawConstants.ClawSettings;
-import com.stuypulse.robot.subsystems.claw.ClawIO.GripperOutputMode;
-import com.stuypulse.robot.subsystems.claw.ClawIO.ClawOutputs;
+import com.stuypulse.robot.subsystems.claw.ClawIO.PivotOutputMode;
+import com.stuypulse.robot.subsystems.claw.ClawIO.PivotOutputs;
+import com.stuypulse.robot.subsystems.claw.ClawIO.RollerOutputMode;
+import com.stuypulse.robot.subsystems.claw.ClawIO.RollerOutputs;
 import com.stuypulse.robot.util.FullSubsystem;
 
 import org.wpilib.command3.Command;
@@ -19,65 +21,119 @@ import org.littletonrobotics.junction.Logger;
 public class Claw extends FullSubsystem {
     private final ClawIO io;
     private final ClawInputsAutoLogged inputs;
-    private final ClawOutputs outputs;
+    private final PivotOutputs pivotOutputs;
+    private final RollerOutputs rollerOutputs;
 
-    @AutoLogOutput(key = "Claw/State")
-    private ClawState state;
+    @AutoLogOutput(key = "Claw/Pivot/State")
+    private PivotState pivotState;
+    @AutoLogOutput(key = "Claw/Rollers/State")
+    private RollerState rollerState;
 
-    private Claw(final ClawIO io) {
+    public Claw(final ClawIO io) {
         super();
         this.io = io;
         this.inputs = new ClawInputsAutoLogged();
-        this.outputs = new ClawOutputs();
+        this.pivotOutputs = new PivotOutputs();
+        this.rollerOutputs = new RollerOutputs();
+
+        this.pivotState = PivotState.IDLE;
+        this.rollerState = RollerState.IDLE;
     }
 
     // STATE
-    public enum ClawState {
+    private enum PivotState {
+        /** Pivot stopped wherever it is **/
         IDLE,
-        OPEN,
-        GRAB,
-        SQUEEZE;
+        /** Pivot moved to the intake position **/
+        INTAKE,
+        /** Pivot moved to the held position where it holds a gamepiece **/
+        HELD,
+        /** Pivot moved to the outtake position **/
+        OUTTAKE;
     }
 
-    private void setState(final ClawState state) {
-        this.state = state;
+    private void setPivotState(final PivotState state) {
+        this.pivotState = state;
     }
 
-    // EXPOSED COMMANDs
-    private Command commandState(final ClawState state) {
-        return run(coroutine -> setState(state)).named(getName() + state.name());
+    private enum RollerState {
+        /** Rollers stopped **/
+        IDLE,
+        /** Rollers moving inwards to intake a power cube **/
+        INTAKE,
+        /** Rollers moving outwards to eject a power cube **/
+        OUTTAKE;
     }
 
-    public Command commandIdleState() {
-        return commandState(ClawState.IDLE);
+    private void setRollerState(final RollerState state) {
+        this.rollerState = state;
     }
 
-    public Command commandOpenState() {
-        return commandState(ClawState.OPEN);
+    // INTERNAL COMMANDS
+    private Command commandPivotState(final PivotState state) {
+        return run(coroutine -> setPivotState(state)).named(getName() + "PivotSet" + state.name());
     }
 
-    public Command commandGrabState() {
-        return commandState(ClawState.GRAB);
+    private final Command pivotIdleCommand = commandPivotState(PivotState.IDLE);
+    private final Command pivotIntakeCommand = commandPivotState(PivotState.INTAKE);
+    private final Command pivotHeldCommand = commandPivotState(PivotState.HELD);
+    private final Command pivotOuttakeCommand = commandPivotState(PivotState.OUTTAKE);
+
+    private Command commandRollerState(final RollerState state) {
+        return run(coroutine -> setRollerState(state)).named(getName() + "RollerSet" + state.name());
     }
 
-    public Command commandSqueezeState() {
-        return commandState(ClawState.SQUEEZE);
+    private final Command rollerIdleCommand = commandRollerState(RollerState.IDLE);
+    private final Command rollerIntakeCommand = commandRollerState(RollerState.INTAKE);
+    private final Command rollerOuttakeCommand = commandRollerState(RollerState.OUTTAKE);
+
+    // EXPOSED COMMANDS
+    public Command commandPivotIdle() {
+        return pivotIdleCommand;
     }
 
-    // OUTPUT CONTROL
-    private void runMotorsIdle() {
-        this.outputs.gripperOutputMode = GripperOutputMode.IDLE;
+    public Command commandPivotIntake() {
+        return pivotIntakeCommand;
     }
 
+    public Command commandPivotHeld() {
+        return pivotHeldCommand;
+    }
 
-    private void runVoltage(Voltage targetVoltage) {
-        this.outputs.gripperOutputMode = GripperOutputMode.VOLTAGE;
-        this.outputs.gripperTargetVoltage = targetVoltage;
+    public Command commandPivotOuttake() {
+        return pivotOuttakeCommand;
+    }
+
+    public Command comandRollerIdle() {
+        return rollerIdleCommand;
+    }
+
+    public Command commandRollerIntake() {
+        return rollerIntakeCommand;
+    }
+
+    public Command commandRollerOuttake() {
+        return rollerOuttakeCommand;
+    }
+
+    // PIVOT OUTPUT CONTROL
+    private void runPivotIdle() {
+        this.pivotOutputs.pivotOutputMode = PivotOutputMode.IDLE;
     }
 
     private void runMotionProfileSetpoint(Angle setpoint) {
-        this.outputs.gripperOutputMode = GripperOutputMode.MOTION_MAGIC;
-        this.outputs.gripperProfileSetpoint = setpoint;
+        this.pivotOutputs.pivotOutputMode = PivotOutputMode.MOTION_MAGIC;
+        this.pivotOutputs.pivotProfileSetpoint = setpoint;
+    }
+
+    // ROLLER OUTPUT CONTROL
+    private void runRollerIdle() {
+        this.rollerOutputs.rollerOutputMode = RollerOutputMode.IDLE;
+    }
+
+    private void runRollerDutyCycle(double targetDutyCycle) {
+        this.rollerOutputs.rollerOutputMode = RollerOutputMode.DUTY_CYCLE;
+        this.rollerOutputs.rollerTargetDutyCycle = targetDutyCycle;
     }
 
     @Override
@@ -86,20 +142,26 @@ public class Claw extends FullSubsystem {
         Logger.processInputs(getName(), inputs);
 
         if (!GlobalSettings.EnabledSubsystems.CLAW.get()) {
-            this.runMotorsIdle();
+            this.runPivotIdle();
             return;
         }
 
-        switch (this.state) {
-            case IDLE -> this.runMotorsIdle();
-            case OPEN -> this.runMotionProfileSetpoint(ClawSettings.Gripper.OPEN_ANGLE);
-            case GRAB -> this.runMotionProfileSetpoint(ClawSettings.Gripper.GRAB_ANGLE);
-            case SQUEEZE -> this.runVoltage(ClawSettings.Gripper.SQUEEZE_VOLTAGE);
+        switch (this.pivotState) {
+            case IDLE -> this.runPivotIdle();
+            case INTAKE -> this.runMotionProfileSetpoint(ClawSettings.Pivot.INTAKE_ANGLE);
+            case HELD -> this.runMotionProfileSetpoint(ClawSettings.Pivot.HELD_ANGLE);
+            case OUTTAKE -> this.runMotionProfileSetpoint(ClawSettings.Pivot.OUTTAKE_ANGLE);
+        }
+
+        switch(this.rollerState) {
+            case IDLE -> this.runRollerIdle();
+            case INTAKE -> this.runRollerDutyCycle(ClawSettings.Rollers.INTAKE_DUTY_CYCLE);
+            case OUTTAKE -> this.runRollerDutyCycle(ClawSettings.Rollers.OUTTAKE_DUTY_CYCLE);
         }
     }
 
     @Override
-    public void periodicAfterScheduler() {
-        io.applyOutputs(outputs);
+    protected void periodicAfterScheduler() {
+        io.applyPivotOutputs(pivotOutputs);
     }
 }

@@ -6,6 +6,11 @@ package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.auton.AutonomousRoutines;
 import com.stuypulse.robot.constants.GlobalPorts;
+import com.stuypulse.robot.constants.GlobalSettings;
+import com.stuypulse.robot.subsystems.claw.Claw;
+import com.stuypulse.robot.subsystems.claw.ClawIO;
+import com.stuypulse.robot.subsystems.claw.ClawIOSim;
+import com.stuypulse.robot.subsystems.claw.ClawIOTalonFX;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.button.CommandNiDsXboxController;
@@ -24,6 +29,7 @@ public class RobotContainer {
             new CommandNiDsXboxController(GlobalPorts.Gamepad.OPERATOR);
 
     // Subsystem
+    private final Claw claw;
 
     // Autons
     private static SendableChooser<Command> autonChooser = new SendableChooser<>();
@@ -31,6 +37,17 @@ public class RobotContainer {
     // Robot container
 
     public RobotContainer() {
+        switch (GlobalSettings.currentMode) {
+            case REAL -> {
+                claw = new Claw(new ClawIOTalonFX());
+            }
+            case SIM -> {
+                claw = new Claw(new ClawIOSim());
+            }
+            default -> {
+                claw = new Claw(new ClawIO() {});
+            }
+        }
         configureLogging();
         configureDefaultCommands();
         configureButtonBindings();

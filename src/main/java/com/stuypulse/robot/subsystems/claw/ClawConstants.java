@@ -13,39 +13,48 @@ import com.stuypulse.robot.util.talonfx.TalonFXConfig;
 
 public interface ClawConstants {
     interface ClawSettings {
-        interface Gripper {
-            AngularVelocity MAX_GRIPPER_VELOCITY = RPM.of(67); // placeholder
-            AngularAcceleration MAX_GRIPPER_ACCELERATION = RotationsPerSecondPerSecond.of(0.67); // placeholder
+        interface Pivot {
+            AngularVelocity MAX_VELOCITY = RPM.of(67); // placeholder
+            AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(0.67); // placeholder
 
-            Current GRIPPER_SUPPLY_LIMIT = Amps.of(80.0);
-            Time GRIPPER_RAMP_RATE = Milliseconds.of(250); // is this even applicable?!?!
+            Angle INTAKE_ANGLE = Degrees.of(180);
+            Angle HELD_ANGLE = Degrees.of(0);
+            Angle OUTTAKE_ANGLE = Degrees.of(180);
 
-            Voltage SQUEEZE_VOLTAGE = Volts.of(6);
-            Voltage IDLE_VOLTAGE = Volts.zero();
-
-            Angle OPEN_ANGLE = Degrees.of(67); // placeholder
-            Angle GRAB_ANGLE = Degrees.of(30); // placeholder
+            // Sim stuff
+            double GEAR_RATIO = 65.8 / 1;
+            MomentOfInertia MOI = KilogramSquareMeters.of(0.2213322307);
+            Distance ARM_LENGTH = Inches.of(16.3);
+            Angle MIN_ANGLE = Degrees.of(0);
+            Angle MAX_ANGLE = Degrees.of(180);
         }
         interface Rollers {
-            Current ROLLER_SUPPLY_LIMIT = Amps.of(80.0) // placeholder
+            Current ROLLER_SUPPLY_LIMIT = Amps.of(80.0); // placeholder
             
-            double INTAKE_DUTY_CYCLE = 0.75; // placeholder
+            double OUTTAKE_DUTY_CYCLE = -1.0;
+            double INTAKE_DUTY_CYCLE = 1.0;
             double IDLE_DUTY_CYCLE = 0.0;
+
+            // Sim stuff
+            double GEAR_RATIO = 5 / 1;
+            MomentOfInertia MOI = KilogramSquareMeters.of(0.0002609971); // placeholder
         }
-        interface Pivot {}
     }
 
     interface ClawConfigs {
         TalonFXConfig CLAW_GRIPPER_MOTOR_CONFIG = new TalonFXConfig()
             .withInvertedValue(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake)
-            .withMotionProfile(ClawSettings.Gripper.MAX_GRIPPER_VELOCITY, ClawSettings.Gripper.MAX_GRIPPER_ACCELERATION)
-            .withSupplyCurrentLimit(ClawSettings.Gripper.GRIPPER_SUPPLY_LIMIT)
-            .withRampRate(ClawSettings.Gripper.GRIPPER_RAMP_RATE);
+            .withMotionProfile(ClawSettings.Pivot.MAX_VELOCITY, ClawSettings.Pivot.MAX_ACCELERATION);
+        TalonFXConfig CLAW_ROLLER_MOTOR_CONFIG = new TalonFXConfig()
+            .withInvertedValue(InvertedValue.Clockwise_Positive)
+            .withNeutralMode(NeutralModeValue.Coast)
+            .withSupplyCurrentLimit(ClawSettings.Rollers.ROLLER_SUPPLY_LIMIT);
     }
 
     interface ClawPorts {
-        int CLAW_GRIPPER_MOTOR = 1;
+        int CLAW_PIVOT_MOTOR = 1;
+        int CLAW_ROLLER_MOTOR = 2;
     }
 
     interface ClawGains {}

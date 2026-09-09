@@ -32,6 +32,7 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 wpilibJava(getArtifactTypeClass('WPILibJavaArtifact')) {
+                    jvmArgs.add("-XX:+UseZGC")
                 }
 
                 // Static files artifact
