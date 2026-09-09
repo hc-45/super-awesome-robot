@@ -4,10 +4,10 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
+import com.stuypulse.robot.constants.Field;
+
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Transform3d;
-
-import com.stuypulse.robot.subsystems.vision.VisionConstants.VisionSettings;
 
 import java.util.function.Supplier;
 import org.photonvision.simulation.PhotonCameraSim;
@@ -15,7 +15,7 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 
 /** IO implementation for physics sim using PhotonVision simulator. */
-public class CameraIOPhotonSim extends CameraIOPhoton {
+public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     private static VisionSystemSim visionSim;
 
     private final Supplier<Pose2d> poseSupplier;
@@ -27,7 +27,7 @@ public class CameraIOPhotonSim extends CameraIOPhoton {
      * @param name         The name of the camera.
      * @param poseSupplier Supplier for the robot pose to use in simulation.
      */
-    public CameraIOPhotonSim(
+    public VisionIOPhotonVisionSim(
             String name, Transform3d robotToCamera, Supplier<Pose2d> poseSupplier) {
         super(name, robotToCamera);
         this.poseSupplier = poseSupplier;
@@ -35,17 +35,17 @@ public class CameraIOPhotonSim extends CameraIOPhoton {
         // Initialize vision sim
         if (visionSim == null) {
             visionSim = new VisionSystemSim("main");
-            visionSim.addAprilTags(VisionSettings.APRILTAG_LAYOUT);
+            visionSim.addAprilTags(Field.APRIL_TAG_LAYOUT);
         }
 
         // Add sim camera
         var cameraProperties = new SimCameraProperties();
-        cameraSim = new PhotonCameraSim(camera, cameraProperties, VisionSettings.APRILTAG_LAYOUT);
+        cameraSim = new PhotonCameraSim(camera, cameraProperties);
         visionSim.addCamera(cameraSim, robotToCamera);
     }
 
     @Override
-    public void updateInputs(CameraIOInputs inputs) {
+    public void updateInputs(VisionIOInputs inputs) {
         visionSim.update(poseSupplier.get());
         super.updateInputs(inputs);
     }

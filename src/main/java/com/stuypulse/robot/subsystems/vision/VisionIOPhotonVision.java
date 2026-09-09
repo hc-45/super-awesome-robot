@@ -4,11 +4,11 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
+import com.stuypulse.robot.constants.Field;
+
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform3d;
-
-import com.stuypulse.robot.subsystems.vision.VisionConstants.VisionSettings;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -17,23 +17,23 @@ import java.util.Set;
 import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */
-public class CameraIOPhoton implements CameraIO {
+public class VisionIOPhotonVision implements VisionIO {
     protected final PhotonCamera camera;
     protected final Transform3d robotToCamera;
 
     /**
      * Creates a new VisionIOPhotonVision.
      *
-     * @param name          The configured name of the camera.
-     * @param robotToCamera The 3D position of the camera relative to the robot.
+     * @param name             The configured name of the camera.
+     * @param rotationSupplier The 3D position of the camera relative to the robot.
      */
-    public CameraIOPhoton(String name, Transform3d robotToCamera) {
+    public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
         camera = new PhotonCamera(name);
         this.robotToCamera = robotToCamera;
     }
 
     @Override
-    public void updateInputs(CameraIOInputs inputs) {
+    public void updateInputs(VisionIOInputs inputs) {
         inputs.connected = camera.isConnected();
 
         // Read new camera observations
@@ -46,7 +46,7 @@ public class CameraIOPhoton implements CameraIO {
                         Rotation2d.fromDegrees(result.getBestTarget().getYaw()),
                         Rotation2d.fromDegrees(result.getBestTarget().getPitch()));
             } else {
-                inputs.latestTargetObservation = new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
+                inputs.latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
             }
 
             // Add pose observation
@@ -81,7 +81,7 @@ public class CameraIOPhoton implements CameraIO {
                 var target = result.targets.get(0);
 
                 // Calculate robot pose
-                var tagPose = VisionSettings.APRILTAG_LAYOUT.getTagPose(target.fiducialId);
+                var tagPose = Field.APRIL_TAG_LAYOUT.getTagPose(target.fiducialId);
                 if (tagPose.isPresent()) {
                     Transform3d fieldToTarget = new Transform3d(tagPose.get().getTranslation(),
                             tagPose.get().getRotation());
@@ -118,5 +118,10 @@ public class CameraIOPhoton implements CameraIO {
         for (int id : tagIds) {
             inputs.tagIds[i++] = id;
         }
+    }
+
+    @Override
+    public void applyOutputs(VisionIOOutputs outputs) {
+        camera.setPipelineIndex(outputs.pipeline);
     }
 }

@@ -163,5 +163,6 @@ public class Claw extends FullSubsystem {
     @Override
     protected void periodicAfterScheduler() {
         io.applyPivotOutputs(pivotOutputs);
+        io.applyRollerOutputs(rollerOutputs);
     }
 }

@@ -9,7 +9,6 @@ import static org.wpilib.units.Units.*;
 import org.wpilib.units.measure.*;
 
 import com.ctre.phoenix6.StatusCode;
-
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
 

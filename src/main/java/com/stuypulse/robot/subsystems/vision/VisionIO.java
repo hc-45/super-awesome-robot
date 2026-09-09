@@ -4,26 +4,28 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
+import com.stuypulse.robot.constants.Field;
+
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface CameraIO {
+public interface VisionIO {
     @AutoLog
-    public static class CameraIOInputs {
+    class VisionIOInputs {
         public boolean connected = false;
-        public TargetObservation latestTargetObservation = new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
+        public TargetObservation latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
         public PoseObservation[] poseObservations = new PoseObservation[0];
         public int[] tagIds = new int[0];
     }
 
     /** Represents the angle to a simple target, not used for pose estimation. */
-    public static record TargetObservation(Rotation2d tx, Rotation2d ty) {
+    record TargetObservation(Rotation2d tx, Rotation2d ty) {
     }
 
     /** Represents a robot pose sample used for pose estimation. */
-    public static record PoseObservation(
+    record PoseObservation(
             double timestamp,
             Pose3d pose,
             double ambiguity,
@@ -32,12 +34,28 @@ public interface CameraIO {
             PoseObservationType type) {
     }
 
-    public static enum PoseObservationType {
+    enum PoseObservationType {
         MEGATAG_1,
         MEGATAG_2,
         PHOTONVISION
     }
 
-    public default void updateInputs(CameraIOInputs inputs) {
+    enum MegaTagMode {
+        MEGATAG_1,
+        MEGATAG_2
+    }
+
+    class VisionIOOutputs {
+        public MegaTagMode megaTagMode = MegaTagMode.MEGATAG_1;
+
+        public int pipeline = 0;
+
+        public int[] aprilTagIDWhitelist = Field.ALL_TAGS;
+    }
+
+    public default void updateInputs(VisionIOInputs inputs) {
+    }
+
+    public default void applyOutputs(VisionIOOutputs outputs) {
     }
 }

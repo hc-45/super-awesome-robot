@@ -18,20 +18,21 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
  * from external dashboards.
  */
 public interface GlobalSettings {
-    public static final Time DT = Milliseconds.of(20);
+    Time DT = Milliseconds.of(20);
 
-    public interface EnabledSubsystems {
+    interface EnabledSubsystems {
         LoggedNetworkBoolean SWERVE = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Swerve", true);
-        LoggedNetworkBoolean CLIMB = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Climb", true);
+        LoggedNetworkBoolean BUDDY_CLIMB = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Buddy Climb", true);
         LoggedNetworkBoolean ELEVATOR = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Elevator", true);
         LoggedNetworkBoolean CLAW = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Claw", true);
+        LoggedNetworkBoolean VISION = new LoggedNetworkBoolean("/Tuning/Enabled Subsystems/Vision", true);
     }
 
     // AKit stuff
-    public static final Mode simMode = Mode.SIM;
-    public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+    RobotMode SIM_MODE = RobotMode.SIM;
+    RobotMode CURRENT_MODE = RobotBase.isReal() ? RobotMode.REAL : SIM_MODE;
 
-    public static enum Mode {
+    enum RobotMode {
         /** Running on a real robot. */
         REAL,
 
@@ -40,5 +41,12 @@ public interface GlobalSettings {
 
         /** Replaying from a log file. */
         REPLAY
+    }
+
+    VisionMode VISION_MODE = VisionMode.LIMELIGHT;
+
+    enum VisionMode {
+        LIMELIGHT,
+        PHOTON
     }
 }

@@ -89,7 +89,7 @@ public interface SystemSim<T> {
 
     static SystemSim<FlywheelSim> of(FlywheelSim flywheelSim) {
         return new SystemSim<FlywheelSim>() {
-            private Angle position = Rotations.of(0);
+            private Angle position = Rotations.zero();
 
             @Override
             public void setInputVoltage(Voltage voltage) {

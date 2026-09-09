@@ -7,7 +7,7 @@ package com.stuypulse.robot.subsystems.swerve;
 import static org.wpilib.units.Units.*;
 
 import com.stuypulse.robot.constants.GlobalSettings;
-import com.stuypulse.robot.constants.GlobalSettings.Mode;
+import com.stuypulse.robot.constants.GlobalSettings.RobotMode;
 import com.stuypulse.robot.generated.TunerConstants;
 import com.stuypulse.robot.util.FullSubsystem;
 import com.stuypulse.robot.util.LocalADStarAK;
@@ -184,7 +184,7 @@ public class Drive extends FullSubsystem {
     }
 
     // Update gyro alert
-    gyroDisconnectedAlert.set(!gyroInputs.connected && GlobalSettings.currentMode != Mode.SIM);
+    gyroDisconnectedAlert.set(!gyroInputs.connected && GlobalSettings.CURRENT_MODE != RobotMode.SIM);
   }
 
   /**

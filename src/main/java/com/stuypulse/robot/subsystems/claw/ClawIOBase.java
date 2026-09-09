@@ -4,6 +4,9 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.claw;
 
+import com.stuypulse.robot.subsystems.claw.ClawConstants.ClawConfigs;
+import com.stuypulse.robot.subsystems.claw.ClawConstants.ClawSettings;
+
 import org.wpilib.units.measure.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -12,10 +15,9 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.stuypulse.robot.subsystems.claw.ClawConstants.ClawSettings;
 
 // intentionally package private
-abstract sealed class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalonFX {
+sealed abstract class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalonFX {
     private final TalonFX rollerMotor;
     private final TalonFX pivotMotor;
 
@@ -33,13 +35,16 @@ abstract sealed class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalo
     private final StatusSignal<Temperature> rollerMotorTemperature;
     private final StatusSignal<AngularVelocity> rollerMotorAngularVelocity;
     private final StatusSignal<Voltage> rollerMotorVoltage;
-    
-    public ClawIOBase(final TalonFX rollerMotor, final TalonFX pivotMotor) {
+
+    protected ClawIOBase(final TalonFX rollerMotor, final TalonFX pivotMotor) {
         this.rollerMotor = rollerMotor;
         this.pivotMotor = pivotMotor;
 
-        this.motionProfileController = new MotionMagicVoltage(ClawSettings.Pivot.INTAKE_ANGLE);
-        this.rollerDutyCycleController = new DutyCycleOut(ClawSettings.Rollers.IDLE_DUTY_CYCLE);
+        ClawConfigs.CLAW_ROLLER_MOTOR_CONFIG.configure(this.rollerMotor);
+        ClawConfigs.CLAW_PIVOT_MOTOR_CONFIG.configure(this.pivotMotor);
+
+        this.motionProfileController = new MotionMagicVoltage(ClawSettings.Pivot.INTAKE_ANGLE).withEnableFOC(true);
+        this.rollerDutyCycleController = new DutyCycleOut(ClawSettings.Rollers.IDLE_DUTY_CYCLE).withEnableFOC(true);
 
         // pivot signals
         this.pivotMotorSupplyCurrent = this.pivotMotor.getSupplyCurrent();
@@ -78,7 +83,7 @@ abstract sealed class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalo
     public StatusCode applyPivotOutputs(final PivotOutputs outputs) {
         return switch (outputs.pivotOutputMode) {
             case IDLE -> {
-                pivotMotor.stopMotor(); 
+                pivotMotor.stopMotor();
                 yield StatusCode.OK;
             }
             case MOTION_MAGIC -> pivotMotor.setControl(motionProfileController.withPosition(outputs.pivotProfileSetpoint));
@@ -89,7 +94,7 @@ abstract sealed class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalo
     public StatusCode applyRollerOutputs(final RollerOutputs outputs) {
         return switch (outputs.rollerOutputMode) {
             case IDLE -> {
-                rollerMotor.stopMotor(); 
+                rollerMotor.stopMotor();
                 yield StatusCode.OK;
             }
             case DUTY_CYCLE -> rollerMotor.setControl(rollerDutyCycleController.withOutput(outputs.rollerTargetDutyCycle));
