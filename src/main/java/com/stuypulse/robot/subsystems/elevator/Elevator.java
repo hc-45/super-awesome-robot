@@ -67,6 +67,16 @@ public class Elevator extends FullSubsystem {
         return scaleCommand;
     }
 
+    // Exposed inputs
+
+    public boolean isAtScale() {
+        return inputs.TRMotorPosition.isNear(ElevatorSettings.SCALE_ANGLE, ElevatorSettings.SCALE_TOLERANCE) && inputs.TRMotorMotionMagicAtTarget; // kinda sus lock in
+    }
+
+    public boolean isAtSwitch() {
+        return inputs.TRMotorPosition.isNear(ElevatorSettings.SWITCH_ANGLE, ElevatorSettings.SWITCH_TOLERANCE) && inputs.TRMotorMotionMagicAtTarget; // kinda sus lock in
+    }
+
     // Output Control
     private void runIdle() {
         this.outputs.outputMode = ElevatorOutputMode.IDLE;

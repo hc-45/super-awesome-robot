@@ -19,7 +19,9 @@ public interface ElevatorConstants {
     interface ElevatorSettings {
         Angle STOWED_ANGLE = Rotations.zero();
         Angle SWITCH_ANGLE = Rotations.of(1.25);
+        Angle SWITCH_TOLERANCE = Rotations.of(0.1);
         Angle SCALE_ANGLE = Rotations.of(3); // placeholder
+        Angle SCALE_TOLERANCE = Rotations.of(0.1);
 
         Distance DRUM_RADIUS = Inches.of(0.7245);
         double GEAR_RATIO = 11.4/1;

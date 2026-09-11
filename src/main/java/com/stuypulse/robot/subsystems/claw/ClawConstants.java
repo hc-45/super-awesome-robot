@@ -21,7 +21,9 @@ public interface ClawConstants {
 
             Angle INTAKE_ANGLE = Degrees.of(180);
             Angle HELD_ANGLE = Degrees.zero();
+            Angle HELD_THRESHOLD = HELD_ANGLE.minus(Degrees.of(1));
             Angle OUTTAKE_ANGLE = Degrees.of(180);
+            Angle OUTTAKE_THRESHOLD = OUTTAKE_ANGLE.minus(Degrees.of(1));
 
             // Sim stuff
             double GEAR_RATIO = 65.8 / 1;

@@ -116,6 +116,15 @@ public class Claw extends FullSubsystem {
         return rollerOuttakeCommand;
     }
 
+    // EXPOSED INPUTS
+    public boolean isInOuttakePosition() {
+        return inputs.pivotMotorPosition.gt(ClawSettings.Pivot.OUTTAKE_THRESHOLD) && inputs.pivotMotorMotionMagicAtTarget; // kinda sus lock in
+    }
+
+    public boolean isInHeldPosition() {
+        return inputs.pivotMotorPosition.lt(ClawSettings.Pivot.HELD_THRESHOLD) && inputs.pivotMotorMotionMagicAtTarget; // kinda sus lock in
+    }
+
     // PIVOT OUTPUT CONTROL
     private void runPivotIdle() {
         this.pivotOutputs.pivotOutputMode = PivotOutputMode.IDLE;

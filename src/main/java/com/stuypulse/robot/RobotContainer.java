@@ -4,6 +4,8 @@
 /**************************************************************/
 package com.stuypulse.robot;
 
+import com.stuypulse.robot.commands.CompoundCommands;
+import com.stuypulse.robot.commands.DriveCommands;
 import com.stuypulse.robot.commands.auton.AutonomousRoutines;
 import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
@@ -160,6 +162,7 @@ public class RobotContainer {
     /****************/
 
     private void configureDefaultCommands() {
+        drive.setDefaultCommand(DriveCommands.joystickDrive(drive, driver::getLeftX, driver::getLeftY, driver::getRightX));
     }
 
     /***************/
@@ -167,6 +170,10 @@ public class RobotContainer {
     /***************/
 
     private void configureButtonBindings() {
+        driver.leftTrigger().whileTrue(CompoundCommands.alignToScoreScale(drive, elevator, claw));
+        driver.leftBumper().whileTrue(CompoundCommands.alignToScoreSwitch(drive, elevator, claw));
+        driver.rightTrigger().whileTrue(CompoundCommands.outtakeIntakeSide(claw));
+        driver.rightBumper().whileTrue(CompoundCommands.outtakeElevatorSide(claw));
     }
 
     /**************/
