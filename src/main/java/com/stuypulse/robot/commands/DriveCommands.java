@@ -1,11 +1,17 @@
-/************************ PROJECT TRIBECBOT *************************/
-/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
-/* Use of this source code is governed by an MIT-style license */
-/* that can be found in the repository LICENSE file.           */
-/***************************************************************/
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.commands;
 
 import static org.wpilib.units.Units.Seconds;
+
+import com.stuypulse.robot.constants.Field;
+import com.stuypulse.robot.constants.Field.Target;
+import com.stuypulse.robot.constants.GlobalSettings.DriveGains;
+import com.stuypulse.robot.constants.GlobalSettings.DriveSettings;
+import com.stuypulse.robot.constants.GlobalSettings.DriverConstants;
+import com.stuypulse.robot.subsystems.swerve.Drive;
 
 import org.wpilib.command3.*;
 import org.wpilib.driverstation.Alliance;
@@ -24,13 +30,6 @@ import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Units;
 import org.wpilib.system.Timer;
-
-import com.stuypulse.robot.constants.Field;
-import com.stuypulse.robot.constants.Field.Target;
-import com.stuypulse.robot.constants.GlobalSettings.DriveSettings;
-import com.stuypulse.robot.constants.GlobalSettings.DriveGains;
-import com.stuypulse.robot.constants.GlobalSettings.DriverConstants;
-import com.stuypulse.robot.subsystems.swerve.Drive;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

@@ -8,7 +8,6 @@ import static org.wpilib.units.Units.*;
 
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
-import org.wpilib.units.measure.*;
 
 public interface VisionConstants {
     public interface VisionSettings {

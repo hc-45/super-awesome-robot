@@ -54,15 +54,15 @@ public class BuddyClimb extends FullSubsystem {
     private final Command retractCommand = commandState(BuddyClimbState.RETRACT);
     private final Command deployCommand = commandState(BuddyClimbState.DEPLOY);
 
-    public Command commandStop() {
+    public Command commandStopState() {
         return stopCommand;
     }
 
-    public Command commandRetract() {
+    public Command commandRetractState() {
         return retractCommand;
     }
 
-    public Command commandDeploy() {
+    public Command commandDeployState() {
         return deployCommand;
     }
 

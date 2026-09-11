@@ -6,6 +6,8 @@ package com.stuypulse.robot.constants;
 
 import static org.wpilib.units.Units.*;
 
+import com.stuypulse.robot.Robot;
+
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -13,8 +15,6 @@ import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.units.measure.Distance;
 import org.wpilib.vision.apriltag.AprilTagFieldLayout;
 import org.wpilib.vision.apriltag.AprilTagFields;
-
-import com.stuypulse.robot.Robot;
 
 public interface Field {
     AprilTagFieldLayout APRIL_TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);

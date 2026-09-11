@@ -51,19 +51,19 @@ public class Elevator extends FullSubsystem {
     private final Command scaleCommand = commandState(ElevatorState.SCALE);
 
     // Exposed commands
-    public Command commandIdle() {
+    public Command commandIdleState() {
         return idleCommand;
     }
 
-    public Command commandDown() {
+    public Command commandDownState() {
         return downCommand;
     }
 
-    public Command commandSwitch() {
+    public Command commandSwitchState() {
         return switchCommand;
     }
 
-    public Command commandScale() {
+    public Command commandScaleState() {
         return scaleCommand;
     }
 

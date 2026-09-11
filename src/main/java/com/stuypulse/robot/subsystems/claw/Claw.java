@@ -88,31 +88,31 @@ public class Claw extends FullSubsystem {
     private final Command rollerOuttakeCommand = commandRollerState(RollerState.OUTTAKE);
 
     // EXPOSED COMMANDS
-    public Command commandPivotIdle() {
+    public Command commandPivotIdleState() {
         return pivotIdleCommand;
     }
 
-    public Command commandPivotIntake() {
+    public Command commandPivotIntakeState() {
         return pivotIntakeCommand;
     }
 
-    public Command commandPivotHeld() {
+    public Command commandPivotHeldState() {
         return pivotHeldCommand;
     }
 
-    public Command commandPivotOuttake() {
+    public Command commandPivotOuttakeState() {
         return pivotOuttakeCommand;
     }
 
-    public Command comandRollerIdle() {
+    public Command comandRollerIdleState() {
         return rollerIdleCommand;
     }
 
-    public Command commandRollerIntake() {
+    public Command commandRollerIntakeState() {
         return rollerIntakeCommand;
     }
 
-    public Command commandRollerOuttake() {
+    public Command commandRollerOuttakeState() {
         return rollerOuttakeCommand;
     }
 
