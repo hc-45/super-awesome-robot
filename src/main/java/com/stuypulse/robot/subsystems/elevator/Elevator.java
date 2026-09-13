@@ -4,22 +4,29 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.elevator;
 
+import static org.wpilib.units.Units.Rotations;
+
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.subsystems.elevator.ElevatorConstants.ElevatorSettings;
 import com.stuypulse.robot.subsystems.elevator.ElevatorIO.ElevatorOutputMode;
 import com.stuypulse.robot.subsystems.elevator.ElevatorIO.ElevatorOutputs;
 import com.stuypulse.robot.util.FullSubsystem;
+import com.stuypulse.robot.util.simulation.SimulatedMechanism;
 
 import org.wpilib.command3.Command;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.units.measure.Angle;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends FullSubsystem {
+public class Elevator extends FullSubsystem implements SimulatedMechanism {
     private final ElevatorIO io;
     private final ElevatorInputsAutoLogged inputs;
     private final ElevatorOutputs outputs;
 
+    @AutoLogOutput(key = "Elevator/State")
     private ElevatorState state;
 
     public Elevator(final ElevatorIO io) {
@@ -108,5 +115,11 @@ public class Elevator extends FullSubsystem {
     @Override
     protected void periodicAfterScheduler() {
         io.applyOutputs(outputs);
+    }
+
+    @Override
+    public Pose3d getSimulatedPose() {
+        Logger.recordOutput("Elevator/MetersPerRotation", ElevatorSettings.METERS_PER_ROTATION);
+        return new Pose3d(0,0, ElevatorSettings.METERS_PER_ROTATION * inputs.TRMotorPosition.in(Rotations), new Rotation3d());
     }
 }

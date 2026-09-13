@@ -14,12 +14,14 @@ import com.stuypulse.robot.subsystems.claw.ClawConstants.ClawSettings;
 import com.stuypulse.robot.util.talonfx.sim.SystemSim;
 import com.stuypulse.robot.util.talonfx.sim.TalonFXSimulation;
 
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.Models;
 import org.wpilib.simulation.DCMotorSim;
 import org.wpilib.simulation.SingleJointedArmSim;
 
 import com.ctre.phoenix6.StatusCode;
+import org.littletonrobotics.junction.Logger;
 
 public final class ClawIOSim extends ClawIOBase {
     private final SystemSim<SingleJointedArmSim> pivotSim;
@@ -71,6 +73,11 @@ public final class ClawIOSim extends ClawIOBase {
 
         rollerSim.update(GlobalSettings.DT);
         clawRollerMotor.refresh();
+
+        Logger.recordOutput("Claw/simPosition", pivotSim.getMechanismPosition());
+        Logger.recordOutput("Claw/DebugArmVoltage", pivotSim.getLinearSystemSim().getInput(0));
+        Logger.recordOutput("Claw/DebugArmAngleRad", pivotSim.getLinearSystemSim().getAngle());
+        Logger.recordOutput("Claw/DebugEnabled", DriverStationBackend.isEnabled());
 
         return super.updateInputs(inputs);
     }

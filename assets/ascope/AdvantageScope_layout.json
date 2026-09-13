@@ -1,0 +1,119 @@
+{
+  "hubs": [
+    {
+      "x": -8,
+      "y": -8,
+      "width": 1936,
+      "height": 1048,
+      "state": {
+        "sidebar": {
+          "width": 291,
+          "expanded": [
+            "/AdvScope",
+            "/Robot",
+            "/Robot/AdvScope",
+            "/Robot/Vision",
+            "/RealOutputs",
+            "/RealOutputs/AdvScope",
+            "/Elevator"
+          ]
+        },
+        "tabs": {
+          "selected": 1,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "ntadd0zmjif9s5u0q0p4tfvmrde8kikn",
+              "renderer": "",
+              "controlsHeight": 0
+            },
+            {
+              "type": 3,
+              "title": "3D Field",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "/RealOutputs/AdvScope/DTPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "model": "Group 2 - Zixi"
+                    }
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "/RealOutputs/AdvScope/MovingStagePose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "/RealOutputs/AdvScope/CarriagePose",
+                    "logType": "Pose3d",
+                    "visible": false,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "/RealOutputs/AdvScope/ClawPose",
+                    "logType": "Pose3d",
+                    "visible": false,
+                    "options": {}
+                  }
+                ],
+                "game": "FRC:2026 Field"
+              },
+              "controllerUUID": "39nv7qw39guqelsnb2bbsmc5xxa8t6iq",
+              "renderer": {
+                "cameraIndex": -2,
+                "orbitFov": 30,
+                "cameraPosition": [
+                  -12.989572355524741,
+                  9.030567136594742,
+                  -4.9715925712072115
+                ],
+                "cameraTarget": [
+                  0.864533887213915,
+                  0.6111516375111994,
+                  0.39029689187011507
+                ]
+              },
+              "controlsHeight": 143
+            },
+            {
+              "type": 9,
+              "title": "Swerve",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "states",
+                    "logKey": "NT:AdvScope/SwerveStates",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  }
+                ],
+                "maxSpeed": 5,
+                "sizeX": 0.65,
+                "sizeY": 0.65,
+                "orientation": 1
+              },
+              "controllerUUID": "1xw9k25wtrgafrv4t36gok3hh5y10qfm",
+              "renderer": null,
+              "controlsHeight": 200
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "26.0.0"
+}

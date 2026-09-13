@@ -20,6 +20,8 @@ public interface ClawIO {
         public Angle pivotMotorPosition = Rotations.zero();
         public boolean pivotMotorMotionMagicAtTarget = false;
         public Voltage pivotMotorVoltage = Volts.zero();
+        public double pivotMotorProfilePosition = 0.0;
+        public double pivotMotorProfileVelocity = 0.0;
 
         public Current rollerMotorSupplyCurrent = Amps.zero();
         public Current rollerMotorStatorCurrent = Amps.zero();

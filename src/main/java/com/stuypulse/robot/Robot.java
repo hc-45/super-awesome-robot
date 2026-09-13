@@ -11,6 +11,7 @@ import org.wpilib.command3.Scheduler;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
 
+import com.ctre.phoenix6.SignalLogger;
 import java.util.Optional;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -53,6 +54,7 @@ public class Robot extends LoggedRobot {
         if (isReal()) {
             Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+            SignalLogger.start();
         } else {
             // setUseTiming(false); // Run as fast as possible
             // String logPath = LogFileUtil
@@ -63,6 +65,8 @@ public class Robot extends LoggedRobot {
             //                 LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
             Logger.addDataReceiver(new WPILOGWriter("logs/"));
             Logger.addDataReceiver(new NT4Publisher());
+            SignalLogger.setPath("logs/");
+            SignalLogger.start();
         }
 
         Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may
@@ -77,6 +81,11 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         defaultScheduler.run();
         FullSubsystem.runAllPeriodicAfterScheduler();
+        Logger.recordOutput(
+            "Scheduler/ActiveCommands",
+            defaultScheduler.getRunningCommands().stream().map(Command::name)
+            .toArray(String[]::new)
+        );
     }
 
     /*********************/

@@ -17,6 +17,7 @@ import org.wpilib.math.system.Models;
 import org.wpilib.simulation.ElevatorSim;
 
 import com.ctre.phoenix6.StatusCode;
+import org.littletonrobotics.junction.Logger;
 
 public final class ElevatorIOSim extends ElevatorIOBase {
     private final SystemSim<ElevatorSim> elevatorSim;
@@ -52,10 +53,12 @@ public final class ElevatorIOSim extends ElevatorIOBase {
     public StatusCode updateInputs(final ElevatorInputs inputs) {
         elevatorSim.update(GlobalSettings.DT);
 
-        TRMotor.refresh();
         BRMotor.refresh();
         BLMotor.refresh();
         TLMotor.refresh();
+        TRMotor.refresh(); // leader last
+        Logger.recordOutput("Elevator/simPosition", elevatorSim.getMechanismPosition());
+        Logger.recordOutput("Elevator/simOrientation", TRMotor.getSimState().Orientation);
 
         return super.updateInputs(inputs);
     }

@@ -11,12 +11,14 @@ import com.stuypulse.robot.constants.GlobalSettings.RobotMode;
 import com.stuypulse.robot.generated.TunerConstants;
 import com.stuypulse.robot.util.FullSubsystem;
 import com.stuypulse.robot.util.LocalADStarAK;
+import com.stuypulse.robot.util.simulation.SimulatedMechanism;
 
 import org.wpilib.driverstation.Alert;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
@@ -35,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Drive extends FullSubsystem {
+public class Drive extends FullSubsystem implements SimulatedMechanism {
     // TunerConstants doesn't include these constants, so they are declared locally
     static final double ODOMETRY_FREQUENCY = TunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
     public static final double DRIVE_BASE_RADIUS = Math.max(
@@ -171,6 +173,7 @@ public class Drive extends FullSubsystem {
             // Apply update
             poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
         }
+        Logger.recordOutput("AdvScope/SwerveStates", getChassisVelocities());
 
         // Update gyro alert
         gyroDisconnectedAlert.set(!gyroInputs.connected && GlobalSettings.CURRENT_MODE != RobotMode.SIM);
@@ -284,6 +287,11 @@ public class Drive extends FullSubsystem {
     @AutoLogOutput(key = "Odometry/Robot")
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    @Override
+    public Pose3d getSimulatedPose() {
+        return new Pose3d(getPose());
     }
 
     /** Returns the current odometry rotation. */

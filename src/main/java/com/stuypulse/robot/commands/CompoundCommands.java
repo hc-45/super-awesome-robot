@@ -10,14 +10,19 @@ import com.stuypulse.robot.subsystems.swerve.Drive;
 
 import org.wpilib.command3.Command;
 
+import org.littletonrobotics.junction.Logger;
+
 public interface CompoundCommands {
     public static Command alignToScoreScale(final Drive drive, final Elevator elevator, final Claw claw) {
         return Command.noRequirements(coroutine -> {
+            Logger.recordOutput("Elevator/CommandStatus", "alignToSclae");
             coroutine.await(DriveCommands.alignToScale(drive));
+            Logger.recordOutput("Elevator/CommandStatus", "elevatorScale");
             coroutine.await(elevator.commandScaleState());
             while (!elevator.isAtScale()) {
                 coroutine.yield();
             }
+            Logger.recordOutput("Elevator/CommandStatus", "complete");
         }).named("AlignToScoreScale");
     }
 
@@ -34,7 +39,7 @@ public interface CompoundCommands {
     public static Command outtakeIntakeSide(final Claw claw) {
         return Command.requiring(claw).executing(coroutine -> {
             coroutine.await(claw.commandPivotOuttakeState());
-            while (!claw.isInOuttakePosition()) {
+            while (!claw.isInDeployedPosition()) {
                 coroutine.yield();
             }
             coroutine.await(claw.commandRollerOuttakeState());
@@ -49,5 +54,18 @@ public interface CompoundCommands {
             }
             coroutine.await(claw.commandRollerOuttakeState());
         }).named("OuttakeElevatorSide");
+    }
+
+    public static Command intake(final Claw claw) {
+        return Command.requiring(claw).executing(coroutine -> {
+            coroutine.await(claw.commandPivotIntakeState());
+            Logger.recordOutput("Claw/CommandStatus", "intakeState");
+            while (!claw.isInDeployedPosition()) {
+                Logger.recordOutput("Claw/CommandStatus", "yieldForDeploy");
+                coroutine.yield();
+            }
+            Logger.recordOutput("Claw/CommandStatus", "outtakeState");
+            coroutine.await(claw.commandRollerIntakeState());
+        }).named("IntakeElevatorSide");
     }
 }

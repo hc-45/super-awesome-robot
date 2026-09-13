@@ -35,6 +35,7 @@ import com.stuypulse.robot.subsystems.vision.VisionIO;
 import com.stuypulse.robot.subsystems.vision.VisionIOLimelight;
 import com.stuypulse.robot.subsystems.vision.VisionIOPhotonVision;
 import com.stuypulse.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import com.stuypulse.robot.util.simulation.Simulation;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.button.CommandNiDsXboxController;
@@ -141,6 +142,7 @@ public class RobotContainer {
         }
 
         vision = new Vision(drive::addVisionMeasurement, cameraIOMap);
+        new Simulation(drive, elevator, claw);
 
         configureLogging();
         configureDefaultCommands();
@@ -170,10 +172,11 @@ public class RobotContainer {
     /***************/
 
     private void configureButtonBindings() {
-        driver.leftTrigger().whileTrue(CompoundCommands.alignToScoreScale(drive, elevator, claw));
+        driver.b().whileTrue(CompoundCommands.alignToScoreScale(drive, elevator, claw));
         driver.leftBumper().whileTrue(CompoundCommands.alignToScoreSwitch(drive, elevator, claw));
-        driver.rightTrigger().whileTrue(CompoundCommands.outtakeIntakeSide(claw));
+        driver.x().whileTrue(CompoundCommands.outtakeIntakeSide(claw));
         driver.rightBumper().whileTrue(CompoundCommands.outtakeElevatorSide(claw));
+        driver.a().onTrue(CompoundCommands.intake(claw));
     }
 
     /**************/

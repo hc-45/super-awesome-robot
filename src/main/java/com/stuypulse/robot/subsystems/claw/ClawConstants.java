@@ -8,6 +8,7 @@ import static org.wpilib.units.Units.*;
 
 import com.stuypulse.robot.util.talonfx.TalonFXConfig;
 
+import org.wpilib.units.AngularAccelerationUnit;
 import org.wpilib.units.measure.*;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -16,14 +17,15 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 public interface ClawConstants {
     interface ClawSettings {
         interface Pivot {
-            AngularVelocity MAX_VELOCITY = RPM.of(67); // placeholder
-            AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(0.67); // placeholder
+            AngularVelocity MAX_VELOCITY = RPM.of(100); // placeholder
+            AngularAcceleration MAX_ACCELERATION = RotationsPerSecondPerSecond.of(100); // placeholder
+            Velocity<AngularAccelerationUnit> MAX_JERK = RotationsPerSecondPerSecond.per(Second).of(1600);
 
             Angle INTAKE_ANGLE = Degrees.of(180);
             Angle HELD_ANGLE = Degrees.zero();
             Angle HELD_THRESHOLD = HELD_ANGLE.minus(Degrees.of(1));
             Angle OUTTAKE_ANGLE = Degrees.of(180);
-            Angle OUTTAKE_THRESHOLD = OUTTAKE_ANGLE.minus(Degrees.of(1));
+            Angle DEPLOYED_THRESHOLD = OUTTAKE_ANGLE.minus(Degrees.of(1));
 
             // Sim stuff
             double GEAR_RATIO = 65.8 / 1;
@@ -41,7 +43,7 @@ public interface ClawConstants {
 
             // Sim stuff
             double GEAR_RATIO = 5 / 1;
-            MomentOfInertia MOI = KilogramSquareMeters.of(0.0002609971); // placeholder
+            MomentOfInertia MOI = KilogramSquareMeters.of(0.0002609971);
         }
     }
 
@@ -54,12 +56,25 @@ public interface ClawConstants {
         TalonFXConfig CLAW_PIVOT_MOTOR_CONFIG = new TalonFXConfig()
             .withInvertedValue(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Brake)
-            .withMotionProfile(ClawSettings.Pivot.MAX_VELOCITY, ClawSettings.Pivot.MAX_ACCELERATION);
+            .withPIDConstants(ClawGains.Pivot.kP, ClawGains.Pivot.kI, ClawGains.Pivot.kD, 0)
+            .withFFConstants(ClawGains.Pivot.kS, ClawGains.Pivot.kV, 0, 0)
+            .withMotionProfile(ClawSettings.Pivot.MAX_VELOCITY, ClawSettings.Pivot.MAX_ACCELERATION, ClawSettings.Pivot.MAX_JERK)
+            .withSensorToMechanismRatio(ClawSettings.Pivot.GEAR_RATIO);
         TalonFXConfig CLAW_ROLLER_MOTOR_CONFIG = new TalonFXConfig()
             .withInvertedValue(InvertedValue.Clockwise_Positive)
             .withNeutralMode(NeutralModeValue.Coast)
             .withSupplyCurrentLimit(ClawSettings.Rollers.ROLLER_SUPPLY_LIMIT);
     }
 
-    interface ClawGains {}
+    interface ClawGains {
+        interface Pivot {
+            // all placeholder
+            double kP = 60.0;
+            double kI = 0.0;
+            double kD = 0.01;
+
+            double kV = 0.2;
+            double kS = 0.25;
+        }
+    }
 }

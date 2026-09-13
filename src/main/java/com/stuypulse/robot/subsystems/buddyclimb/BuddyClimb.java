@@ -21,7 +21,7 @@ public class BuddyClimb extends FullSubsystem {
     private final BuddyClimbInputsAutoLogged inputs;
     private final BuddyClimbOutputs outputs;
 
-    @AutoLogOutput(key = "Claw/Pivot/State")
+    @AutoLogOutput(key = "BuddyClimb/State")
     private BuddyClimbState state;
 
     public BuddyClimb(final BuddyIO io) {

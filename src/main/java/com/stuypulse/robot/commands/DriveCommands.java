@@ -42,16 +42,16 @@ import java.util.function.Supplier;
 public interface DriveCommands {
     public static Command resetPose(final Drive drive, final Pose2d pose) {
         return drive.run(
-            coroutine -> {
-                drive.resetPose(pose);
-            }).named(drive.getName() + "ResetPose");
+                coroutine -> {
+                    drive.resetPose(pose);
+                }).named(drive.getName() + "ResetPose");
     }
 
     public static Command resetHeading(final Drive drive, final Rotation2d heading) {
         return drive.run(
-            coroutine -> {
-                drive.resetHeading(heading);
-            }).named(drive.getName() + "ResetHeading");
+                coroutine -> {
+                    drive.resetHeading(heading);
+                }).named(drive.getName() + "ResetHeading");
     }
 
     public static Command xMode(final Drive drive) {
@@ -60,9 +60,10 @@ public interface DriveCommands {
 
     private static Command alignToTarget(final Target target, final Drive drive) {
         final Pose2d targetPose = target.getPose();
-        final Debouncer alignmentDebouncer = new Debouncer(DriveSettings.Alignment.Tolerances.ALIGNMENT_DEBOUNCE.in(Seconds), DebounceType.kBoth);
-        final PIDController headingController =
-            new PIDController(DriveGains.Alignment.akP, DriveGains.Alignment.akI, DriveGains.Alignment.akD);
+        final Debouncer alignmentDebouncer = new Debouncer(
+                DriveSettings.Alignment.Tolerances.ALIGNMENT_DEBOUNCE.in(Seconds), DebounceType.kBoth);
+        final PIDController headingController = new PIDController(DriveGains.Alignment.akP, DriveGains.Alignment.akI,
+                DriveGains.Alignment.akD);
         headingController.enableContinuousInput(-Math.PI, Math.PI);
         headingController.setTolerance(DriveSettings.Alignment.Tolerances.THETA_TOLERANCE.getRadians());
         final BooleanSupplier isAligned = headingController::atSetpoint;
@@ -71,17 +72,18 @@ public interface DriveCommands {
             headingController.reset();
 
             while (!alignmentDebouncer.calculate(isAligned.getAsBoolean())) {
-                double omega = headingController.calculate(drive.getPose().getRotation().getRadians(), getTargetAlignmentAngle(drive.getPose(), targetPose).getRadians());
+                double omega = headingController.calculate(drive.getPose().getRotation().getRadians(),
+                        getTargetAlignmentAngle(drive.getPose(), targetPose).getRadians());
                 ChassisVelocities speeds = new ChassisVelocities(
-                    0,
-                    0,
-                    omega * drive.getMaxAngularSpeedRadPerSec());
+                        0,
+                        0,
+                        omega * drive.getMaxAngularSpeedRadPerSec());
                 drive.runVelocity(speeds.toRobotRelative(drive.getRotation()));
                 coroutine.yield();
             }
         })
-        .whenCanceled(headingController::close)
-        .named(drive.getName() + "AlignTo" + target.name());
+                .whenCanceled(headingController::close)
+                .named(drive.getName() + "AlignTo" + target.name());
     }
 
     public static Command alignToScale(final Drive drive) {
@@ -166,7 +168,8 @@ public interface DriveCommands {
                 DriverConstants.ANGLE_KP,
                 DriverConstants.ANGLE_KI,
                 DriverConstants.ANGLE_KD,
-                new TrapezoidProfile.Constraints(DriverConstants.ANGLE_MAX_VELOCITY, DriverConstants.ANGLE_MAX_ACCELERATION));
+                new TrapezoidProfile.Constraints(DriverConstants.ANGLE_MAX_VELOCITY,
+                        DriverConstants.ANGLE_MAX_ACCELERATION));
         angleController.enableContinuousInput(-Math.PI, Math.PI);
 
         // Construct command

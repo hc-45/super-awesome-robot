@@ -21,6 +21,8 @@ public interface ElevatorIO {
         public Angle TRMotorPosition = Rotations.zero();
         public boolean TRMotorMotionMagicAtTarget = false;
         public Voltage TRMotorVoltage = Volts.zero();
+        public double TRMotorProfilePosition = 0.0;
+        public double TRMotorProfileVelocity = 0.0;
     }
 
     enum ElevatorOutputMode {

@@ -4,45 +4,22 @@
 /**************************************************************/
 package com.stuypulse.robot.util.talonfx;
 
-import static org.wpilib.units.Units.Amps;
-import static org.wpilib.units.Units.Rotations;
-import static org.wpilib.units.Units.RotationsPerSecond;
-import static org.wpilib.units.Units.RotationsPerSecondPerSecond;
-import static org.wpilib.units.Units.Seconds;
-import static org.wpilib.units.Units.Volts;
+import static org.wpilib.units.Units.*;
 
-import org.wpilib.units.measure.Angle;
-import org.wpilib.units.measure.AngularAcceleration;
-import org.wpilib.units.measure.AngularVelocity;
-import org.wpilib.units.measure.Current;
-import org.wpilib.units.measure.Time;
-import org.wpilib.units.measure.Voltage;
+import org.wpilib.units.AngularAccelerationUnit;
+import org.wpilib.units.AngularVelocityUnit;
+import org.wpilib.units.VoltageUnit;
+import org.wpilib.units.measure.*;
 
-import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.Slot1Configs;
-import com.ctre.phoenix6.configs.Slot2Configs;
-import com.ctre.phoenix6.configs.SlotConfigs;
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
-import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.GainSchedBehaviorValue;
-import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+import com.ctre.phoenix6.signals.*;
 
 /** Wrapper class for configuring TalonFX motors */
 public class TalonFXConfig {
+    private static final TalonFXConfiguration BLANK_CONFIG = new TalonFXConfiguration();
+
     private final TalonFXConfiguration configuration = new TalonFXConfiguration();
     private final Slot0Configs slot0Configs = new Slot0Configs();
     private final Slot1Configs slot1Configs = new Slot1Configs();
@@ -67,11 +44,9 @@ public class TalonFXConfig {
     private final double[] lastKV = new double[3];
     private final double[] lastKA = new double[3];
 
-    public void configure(TalonFX motor) {
-        TalonFXConfiguration defaultConfig = new TalonFXConfiguration();
-        motor.getConfigurator().apply(defaultConfig);
-
-        motor.getConfigurator().apply(configuration);
+    public StatusCode configure(TalonFX motor) {
+        motor.getConfigurator().apply(BLANK_CONFIG);
+        return motor.getConfigurator().apply(configuration);
     }
 
     public TalonFXConfiguration getConfiguration() {
@@ -599,10 +574,11 @@ public class TalonFXConfig {
      * @return Itself for method-chaining.
      */
     public TalonFXConfig withMotionProfile(
-            double maxVelocityRotPerSec, double maxAccelerationRotPerSecSquared) {
+            double maxVelocityRotPerSec, double maxAccelerationRotPerSecSquared, double maxJerkRotationsPerSecCubed) {
         return this.withMotionProfile(
                 RotationsPerSecond.of(maxVelocityRotPerSec),
-                RotationsPerSecondPerSecond.of(maxAccelerationRotPerSecSquared));
+                RotationsPerSecondPerSecond.of(maxAccelerationRotPerSecSquared),
+                RotationsPerSecondPerSecond.per(Second).of(maxJerkRotationsPerSecCubed));
     }
 
     /**
@@ -610,12 +586,50 @@ public class TalonFXConfig {
      *
      * @param maxVelocity Maximum/cruise velocity of the motion profile.
      * @param maxAcceleration Maximum acceleration of the motion profile.
+     * @param maxJerk Maximum jerk of the motion profile.
      * @return Itself for method-chaining.
      */
     public TalonFXConfig withMotionProfile(
-            AngularVelocity maxVelocity, AngularAcceleration maxAcceleration) {
+            AngularVelocity maxVelocity, AngularAcceleration maxAcceleration, Velocity<AngularAccelerationUnit> maxJerk) {
         motionMagicConfigs.withMotionMagicCruiseVelocity(maxVelocity);
         motionMagicConfigs.withMotionMagicAcceleration(maxAcceleration);
+        motionMagicConfigs.withMotionMagicJerk(maxJerk);
+
+        configuration.withMotionMagic(motionMagicConfigs);
+
+        return this;
+    }
+
+    /**
+     * Modifies this configuration's motion magic profile.
+     *
+     * @param kV kV of the motion profile in volts/rotations per second.
+     * @param kA kA of the motion profile in volts/rotations per second².
+     * @param maxVelocityRotPerSec Maximum velocity of the motion profile in rotations per second.
+     * @return Itself for method-chaining.
+     */
+    public TalonFXConfig withExpoProfile(double kV, double kA, double maxVelocityRotPerSec) {
+        motionMagicConfigs.withMotionMagicExpo_kV(kV);
+        motionMagicConfigs.withMotionMagicExpo_kA(kA);
+        motionMagicConfigs.withMotionMagicCruiseVelocity(maxVelocityRotPerSec);
+
+        configuration.withMotionMagic(motionMagicConfigs);
+
+        return this;
+    }
+
+    /**
+     * Modifies this configuration's motion magic profile.
+     *
+     * @param kV kV of the motion profile.
+     * @param kA kA of the motion profile.
+     * @param maxVelocityRotPerSec Maximum velocity of the motion profile.
+     * @return Itself for method-chaining.
+     */
+    public TalonFXConfig withExpoProfile(Per<VoltageUnit, AngularVelocityUnit> kV, Per<VoltageUnit, AngularAccelerationUnit> kA, AngularVelocity maxVelocity) {
+        motionMagicConfigs.withMotionMagicExpo_kV(kV);
+        motionMagicConfigs.withMotionMagicExpo_kA(kA);
+        motionMagicConfigs.withMotionMagicCruiseVelocity(maxVelocity);
 
         configuration.withMotionMagic(motionMagicConfigs);
 

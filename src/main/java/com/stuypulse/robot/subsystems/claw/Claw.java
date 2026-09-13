@@ -4,6 +4,8 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.claw;
 
+import static org.wpilib.units.Units.Rotations;
+
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.subsystems.claw.ClawConstants.ClawSettings;
 import com.stuypulse.robot.subsystems.claw.ClawIO.PivotOutputMode;
@@ -11,14 +13,17 @@ import com.stuypulse.robot.subsystems.claw.ClawIO.PivotOutputs;
 import com.stuypulse.robot.subsystems.claw.ClawIO.RollerOutputMode;
 import com.stuypulse.robot.subsystems.claw.ClawIO.RollerOutputs;
 import com.stuypulse.robot.util.FullSubsystem;
+import com.stuypulse.robot.util.simulation.SimulatedMechanism;
 
 import org.wpilib.command3.Command;
+import org.wpilib.math.geometry.Pose3d;
+import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.units.measure.*;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Claw extends FullSubsystem {
+public class Claw extends FullSubsystem implements SimulatedMechanism {
     private final ClawIO io;
     private final ClawInputsAutoLogged inputs;
     private final PivotOutputs pivotOutputs;
@@ -117,8 +122,8 @@ public class Claw extends FullSubsystem {
     }
 
     // EXPOSED INPUTS
-    public boolean isInOuttakePosition() {
-        return inputs.pivotMotorPosition.gt(ClawSettings.Pivot.OUTTAKE_THRESHOLD) && inputs.pivotMotorMotionMagicAtTarget; // kinda sus lock in
+    public boolean isInDeployedPosition() {
+        return inputs.pivotMotorPosition.gt(ClawSettings.Pivot.DEPLOYED_THRESHOLD) && inputs.pivotMotorMotionMagicAtTarget; // kinda sus lock in
     }
 
     public boolean isInHeldPosition() {
@@ -173,5 +178,10 @@ public class Claw extends FullSubsystem {
     protected void periodicAfterScheduler() {
         io.applyPivotOutputs(pivotOutputs);
         io.applyRollerOutputs(rollerOutputs);
+    }
+
+    @Override
+    public Pose3d getSimulatedPose() {
+        return new Pose3d(0,0,0, new Rotation3d(Rotations.zero(), inputs.pivotMotorPosition, Rotations.zero()));
     }
 }

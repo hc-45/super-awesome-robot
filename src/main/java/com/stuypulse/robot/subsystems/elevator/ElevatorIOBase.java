@@ -4,6 +4,8 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.elevator;
 
+import static org.wpilib.units.Units.Radians;
+
 import com.stuypulse.robot.subsystems.elevator.ElevatorConstants.ElevatorConfigs;
 import com.stuypulse.robot.subsystems.elevator.ElevatorConstants.ElevatorSettings;
 
@@ -15,9 +17,10 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import org.littletonrobotics.junction.Logger;
 
 // intentioanlly package private
 sealed abstract class ElevatorIOBase implements ElevatorIO permits ElevatorIOSim, ElevatorIOTalonFX {
@@ -26,7 +29,7 @@ sealed abstract class ElevatorIOBase implements ElevatorIO permits ElevatorIOSim
     private final TalonFX BLMotor; // bottom left
     private final TalonFX TLMotor; // top left
 
-    private final MotionMagicTorqueCurrentFOC motionProfileController;
+    private final MotionMagicExpoVoltage motionProfileController;
     private final Follower rightFollowerController;
     private final Follower leftFollowerController;
 
@@ -35,6 +38,8 @@ sealed abstract class ElevatorIOBase implements ElevatorIO permits ElevatorIOSim
     private final StatusSignal<Angle> TRMotorPosition;
     private final StatusSignal<Boolean> TRMotorMotionMagicAtTarget;
     private final StatusSignal<Voltage> TRMotorVoltage;
+    private final StatusSignal<Double> TRMotorProfilePosition;
+    private final StatusSignal<Double> TRMotorProfileVelocity;
 
     protected ElevatorIOBase(final TalonFX TRMotor, final TalonFX BRMotor, final TalonFX BLMotor, final TalonFX TLMotor) {
         this.TRMotor = TRMotor;
@@ -42,14 +47,14 @@ sealed abstract class ElevatorIOBase implements ElevatorIO permits ElevatorIOSim
         this.BLMotor = BLMotor;
         this.TLMotor = TLMotor;
 
-        ElevatorConfigs.ELEVATOR_GEARBOX_MOTOR_CONFIG.configure(this.TRMotor);
-        ElevatorConfigs.ELEVATOR_GEARBOX_MOTOR_CONFIG.configure(this.BRMotor);
-        ElevatorConfigs.ELEVATOR_GEARBOX_MOTOR_CONFIG.configure(this.BLMotor);
-        ElevatorConfigs.ELEVATOR_GEARBOX_MOTOR_CONFIG.configure(this.TLMotor);
+        ElevatorConfigs.TR_GEARBOX_MOTOR_CONFIG.configure(this.TRMotor);
+        ElevatorConfigs.TR_GEARBOX_MOTOR_CONFIG.configure(this.BRMotor);
+        ElevatorConfigs.TR_GEARBOX_MOTOR_CONFIG.configure(this.BLMotor);
+        ElevatorConfigs.TR_GEARBOX_MOTOR_CONFIG.configure(this.TLMotor);
 
-        this.motionProfileController = new MotionMagicTorqueCurrentFOC(ElevatorSettings.STOWED_ANGLE);
+        this.motionProfileController = new MotionMagicExpoVoltage(ElevatorSettings.STOWED_ANGLE);
         this.rightFollowerController = new Follower(this.TRMotor.getDeviceID(), MotorAlignmentValue.Aligned);
-        this.leftFollowerController = new Follower(this.TRMotor.getDeviceID(), MotorAlignmentValue.Aligned);
+        this.leftFollowerController = new Follower(this.TRMotor.getDeviceID(), MotorAlignmentValue.Opposed);
 
         this.BRMotor.setControl(rightFollowerController);
         this.TLMotor.setControl(leftFollowerController);
@@ -60,17 +65,22 @@ sealed abstract class ElevatorIOBase implements ElevatorIO permits ElevatorIOSim
         this.TRMotorPosition = this.TRMotor.getPosition();
         this.TRMotorMotionMagicAtTarget = this.TRMotor.getMotionMagicAtTarget();
         this.TRMotorVoltage = this.TRMotor.getMotorVoltage();
+        this.TRMotorProfilePosition = this.TRMotor.getClosedLoopReference();
+        this.TRMotorProfileVelocity = this.TRMotor.getClosedLoopReferenceSlope();
     }
 
     @Override
     public StatusCode updateInputs(final ElevatorInputs inputs) {
-        final StatusCode refreshStatusCode = BaseStatusSignal.refreshAll(TRMotorSupplyCurrent, TRMotorStatorCurrent, TRMotorPosition, TRMotorMotionMagicAtTarget, TRMotorVoltage);
+        final StatusCode refreshStatusCode = BaseStatusSignal.refreshAll(TRMotorSupplyCurrent, TRMotorStatorCurrent, TRMotorPosition, TRMotorMotionMagicAtTarget, TRMotorVoltage, TRMotorProfilePosition, TRMotorProfileVelocity);
 
         inputs.TRMotorSupplyCurrent = TRMotorSupplyCurrent.getValue();
         inputs.TRMotorStatorCurrent = TRMotorStatorCurrent.getValue();
         inputs.TRMotorPosition = TRMotorPosition.getValue();
+        Logger.recordOutput("Elevator/motorPositionRotations", TRMotorPosition.getValue().in(Radians));
         inputs.TRMotorMotionMagicAtTarget = TRMotorMotionMagicAtTarget.getValue();
         inputs.TRMotorVoltage = TRMotorVoltage.getValue();
+        inputs.TRMotorProfilePosition = TRMotorProfilePosition.getValue();
+        inputs.TRMotorProfileVelocity = TRMotorProfileVelocity.getValue();
 
         return refreshStatusCode;
     }

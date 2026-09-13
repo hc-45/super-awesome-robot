@@ -29,6 +29,8 @@ sealed abstract class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalo
     private final StatusSignal<Angle> pivotMotorPosition;
     private final StatusSignal<Boolean> pivotMotorMotionMagicAtTarget;
     private final StatusSignal<Voltage> pivotMotorVoltage;
+    private final StatusSignal<Double> pivotMotorProfilePosition;
+    private final StatusSignal<Double> pivotMotorProfileVelocity;
 
     private final StatusSignal<Current> rollerMotorSupplyCurrent;
     private final StatusSignal<Current> rollerMotorStatorCurrent;
@@ -52,6 +54,8 @@ sealed abstract class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalo
         this.pivotMotorPosition = this.pivotMotor.getPosition();
         this.pivotMotorVoltage = this.pivotMotor.getMotorVoltage();
         this.pivotMotorMotionMagicAtTarget = this.pivotMotor.getMotionMagicAtTarget();
+        this.pivotMotorProfilePosition = this.pivotMotor.getClosedLoopReference();
+        this.pivotMotorProfileVelocity = this.pivotMotor.getClosedLoopReferenceSlope();
 
         // roller signals
         this.rollerMotorSupplyCurrent = this.rollerMotor.getSupplyCurrent();
@@ -63,13 +67,15 @@ sealed abstract class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalo
 
     @Override
     public StatusCode updateInputs(final ClawInputs inputs) {
-        final StatusCode refreshStatusCode = BaseStatusSignal.refreshAll(pivotMotorSupplyCurrent, pivotMotorStatorCurrent, pivotMotorPosition, pivotMotorVoltage, pivotMotorMotionMagicAtTarget);
+        final StatusCode refreshStatusCode = BaseStatusSignal.refreshAll(pivotMotorSupplyCurrent, pivotMotorStatorCurrent, pivotMotorPosition, pivotMotorVoltage, pivotMotorMotionMagicAtTarget, pivotMotorProfilePosition, pivotMotorProfileVelocity, rollerMotorSupplyCurrent, rollerMotorStatorCurrent, rollerMotorTemperature, rollerMotorAngularVelocity, rollerMotorVoltage);
 
         inputs.pivotMotorSupplyCurrent = this.pivotMotorSupplyCurrent.getValue();
         inputs.pivotMotorStatorCurrent = this.pivotMotorStatorCurrent.getValue();
         inputs.pivotMotorPosition = this.pivotMotorPosition.getValue();
         inputs.pivotMotorVoltage = this.pivotMotorVoltage.getValue();
         inputs.pivotMotorMotionMagicAtTarget = this.pivotMotorMotionMagicAtTarget.getValue();
+        inputs.pivotMotorProfilePosition = this.pivotMotorProfilePosition.getValue();
+        inputs.pivotMotorProfileVelocity = this.pivotMotorProfileVelocity.getValue();
 
         inputs.rollerMotorSupplyCurrent = this.rollerMotorSupplyCurrent.getValue();
         inputs.rollerMotorStatorCurrent = this.rollerMotorStatorCurrent.getValue();
