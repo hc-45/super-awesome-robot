@@ -9,7 +9,10 @@ import static org.wpilib.units.Units.*;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.units.measure.AngularAcceleration;
+import org.wpilib.units.measure.AngularVelocity;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.units.measure.LinearAcceleration;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.units.measure.Time;
 
@@ -55,6 +58,16 @@ public interface GlobalSettings {
     }
 
     interface DriveSettings {
+        public interface Constraints {
+            LinearVelocity MAX_VELOCITY = MetersPerSecond.of(4.3);
+
+            LinearAcceleration MAX_ACCEL = MetersPerSecondPerSecond.of(20.0);
+
+            AngularVelocity MAX_ANGULAR_VELOCITY = DegreesPerSecond.of(400.0);
+
+            AngularAcceleration MAX_ANGULAR_ACCEL = DegreesPerSecondPerSecond.of(300.0);
+        }
+
         interface Alignment {
             interface Tolerances {
                 Distance X_TOLERANCE = Inches.of(2.0);
@@ -81,7 +94,18 @@ public interface GlobalSettings {
     }
 
     interface DriverConstants {
-        double DEADBAND = 0.1;
+        public interface Driving {
+            double DEADBAND = 0.05;
+            double RC = 0.05;
+            double POWER = 2.0;
+        }
+
+        public interface Turning {
+            double DEADBAND = 0.07;
+            double RC = 0.05;
+            double POWER = 2.0;
+        }
+
         double ANGLE_KP = 5.0;
         double ANGLE_KI = 0.0;
         double ANGLE_KD = 0.4;

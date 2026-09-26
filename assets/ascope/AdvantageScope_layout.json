@@ -15,7 +15,10 @@
             "/Robot/Vision",
             "/RealOutputs",
             "/RealOutputs/AdvScope",
-            "/Elevator"
+            "/Elevator",
+            "/RealOutputs/SwerveStates",
+            "/RealOutputs/SwerveStates/Measured",
+            "/RealOutputs/SwerveStates/Measured/0"
           ]
         },
         "tabs": {
@@ -54,14 +57,14 @@
                     "type": "component",
                     "logKey": "/RealOutputs/AdvScope/CarriagePose",
                     "logType": "Pose3d",
-                    "visible": false,
+                    "visible": true,
                     "options": {}
                   },
                   {
                     "type": "component",
                     "logKey": "/RealOutputs/AdvScope/ClawPose",
                     "logType": "Pose3d",
-                    "visible": false,
+                    "visible": true,
                     "options": {}
                   }
                 ],
@@ -72,14 +75,14 @@
                 "cameraIndex": -2,
                 "orbitFov": 30,
                 "cameraPosition": [
-                  -12.989572355524741,
-                  9.030567136594742,
-                  -4.9715925712072115
+                  0.7786711963322666,
+                  1.3451483807515814,
+                  -1.6534585226208365
                 ],
                 "cameraTarget": [
-                  0.864533887213915,
-                  0.6111516375111994,
-                  0.39029689187011507
+                  0.21625806470771855,
+                  0.7044118235576983,
+                  -0.42704280903581043
                 ]
               },
               "controlsHeight": 143
@@ -108,6 +111,41 @@
               "controllerUUID": "1xw9k25wtrgafrv4t36gok3hh5y10qfm",
               "renderer": null,
               "controlsHeight": 200
+            },
+            {
+              "type": 1,
+              "title": "Line Graph",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "/RealOutputs/SwerveStates/Measured/0/angle/value",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "autoTarget": null,
+                  "preset": null
+                },
+                "rightUnitConversion": {
+                  "autoTarget": null,
+                  "preset": null
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "lpv15i6snvarjp2hkzwt4bn1zrdl84f2",
+              "renderer": null,
+              "controlsHeight": 200
             }
           ]
         }
@@ -115,5 +153,5 @@
     }
   ],
   "satellites": [],
-  "version": "26.0.0"
+  "version": "27.0.0-alpha-4"
 }

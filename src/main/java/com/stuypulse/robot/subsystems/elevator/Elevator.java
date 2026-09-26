@@ -120,6 +120,6 @@ public class Elevator extends FullSubsystem implements SimulatedMechanism {
     @Override
     public Pose3d getSimulatedPose() {
         Logger.recordOutput("Elevator/MetersPerRotation", ElevatorSettings.METERS_PER_ROTATION);
-        return new Pose3d(0,0, ElevatorSettings.METERS_PER_ROTATION * inputs.TRMotorPosition.in(Rotations), new Rotation3d());
+        return new Pose3d(0,0, ElevatorSettings.METERS_PER_ROTATION * inputs.TRMotorPosition.in(Rotations), Rotation3d.kZero);
     }
 }

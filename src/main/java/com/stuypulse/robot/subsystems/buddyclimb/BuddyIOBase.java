@@ -16,7 +16,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 // intentionally package private
-sealed abstract class BuddyIOBase implements BuddyIO permits BuddyIOSim, BuddyIOTalonFX {
+abstract class BuddyIOBase implements BuddyIO {
     private final TalonFX winchMotor;
 
     private final PositionVoltage positionController;

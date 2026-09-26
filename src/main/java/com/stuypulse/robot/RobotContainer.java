@@ -49,8 +49,11 @@ import java.util.EnumMap;
 public class RobotContainer {
 
     // Gamepads
-    public final CommandNiDsXboxController driver = new CommandNiDsXboxController(GlobalPorts.Gamepad.DRIVER);
-    public final CommandNiDsXboxController operator = new CommandNiDsXboxController(GlobalPorts.Gamepad.OPERATOR);
+    public final CommandNiDsXboxController DRIVER = new CommandNiDsXboxController(GlobalPorts.Gamepad.DRIVER);
+    public final CommandNiDsXboxController OPERATOR = new CommandNiDsXboxController(GlobalPorts.Gamepad.OPERATOR);
+
+    // Autons
+    private static final SendableChooser<Command> AUTON_CHOOSER = new SendableChooser<>();
 
     // Subsystem
     private final Drive drive;
@@ -58,9 +61,6 @@ public class RobotContainer {
     private final Claw claw;
     private final Elevator elevator;
     private final Vision vision;
-
-    // Autons
-    private static SendableChooser<Command> autonChooser = new SendableChooser<>();
 
     // Robot container
 
@@ -88,6 +88,7 @@ public class RobotContainer {
                 buddyClimb = new BuddyClimb(new BuddyIOSim());
                 claw = new Claw(new ClawIOSim());
                 elevator = new Elevator(new ElevatorIOSim());
+                new Simulation(drive, elevator, claw);
             }
             default -> {
                 drive = new Drive(
@@ -142,7 +143,6 @@ public class RobotContainer {
         }
 
         vision = new Vision(drive::addVisionMeasurement, cameraIOMap);
-        new Simulation(drive, elevator, claw);
 
         configureLogging();
         configureDefaultCommands();
@@ -164,7 +164,7 @@ public class RobotContainer {
     /****************/
 
     private void configureDefaultCommands() {
-        drive.setDefaultCommand(DriveCommands.joystickDrive(drive, driver::getLeftX, driver::getLeftY, driver::getRightX));
+        drive.setDefaultCommand(DriveCommands.joystickDrive(drive, DRIVER::getLeftX, DRIVER::getLeftY, DRIVER::getRightX));
     }
 
     /***************/
@@ -172,11 +172,11 @@ public class RobotContainer {
     /***************/
 
     private void configureButtonBindings() {
-        driver.b().whileTrue(CompoundCommands.alignToScoreScale(drive, elevator, claw));
-        driver.leftBumper().whileTrue(CompoundCommands.alignToScoreSwitch(drive, elevator, claw));
-        driver.x().whileTrue(CompoundCommands.outtakeIntakeSide(claw));
-        driver.rightBumper().whileTrue(CompoundCommands.outtakeElevatorSide(claw));
-        driver.a().onTrue(CompoundCommands.intake(claw));
+        DRIVER.b().whileTrue(CompoundCommands.alignToScoreScale(drive, elevator, claw));
+        DRIVER.leftBumper().whileTrue(CompoundCommands.alignToScoreSwitch(drive, elevator, claw));
+        DRIVER.x().whileTrue(CompoundCommands.outtakeIntakeSide(claw));
+        DRIVER.rightBumper().whileTrue(CompoundCommands.outtakeElevatorSide(claw));
+        DRIVER.a().onTrue(CompoundCommands.intake(claw));
     }
 
     /**************/
@@ -184,9 +184,9 @@ public class RobotContainer {
     /**************/
 
     public void configureAutons() {
-        autonChooser.setDefaultOption("Do Nothing", AutonomousRoutines.doNothingAuton());
+        AUTON_CHOOSER.setDefaultOption("Do Nothing", AutonomousRoutines.doNothingAuton());
 
-        SmartDashboard.putData("Autonomous", autonChooser);
+        SmartDashboard.putData("Autonomous", AUTON_CHOOSER);
     }
 
     /**
@@ -195,6 +195,6 @@ public class RobotContainer {
      * @return The command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return autonChooser.getSelected();
+        return AUTON_CHOOSER.getSelected();
     }
 }

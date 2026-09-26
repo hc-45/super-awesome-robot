@@ -6,6 +6,7 @@ package com.stuypulse.robot.subsystems.claw;
 
 import static org.wpilib.units.Units.Rotations;
 
+import com.stuypulse.robot.constants.Field;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.subsystems.claw.ClawConstants.ClawSettings;
 import com.stuypulse.robot.subsystems.claw.ClawIO.PivotOutputMode;
@@ -169,8 +170,14 @@ public class Claw extends FullSubsystem implements SimulatedMechanism {
 
         switch(this.rollerState) {
             case IDLE -> this.runRollerIdle();
-            case INTAKE -> this.runRollerDutyCycle(ClawSettings.Rollers.INTAKE_DUTY_CYCLE);
-            case OUTTAKE -> this.runRollerDutyCycle(ClawSettings.Rollers.OUTTAKE_DUTY_CYCLE);
+            case INTAKE -> {
+                this.runRollerDutyCycle(ClawSettings.Rollers.INTAKE_DUTY_CYCLE);
+                this.setCubeState(CubeState.INTAKE);
+            }
+            case OUTTAKE -> {
+                this.runRollerDutyCycle(ClawSettings.Rollers.OUTTAKE_DUTY_CYCLE);
+                this.setCubeState(CubeState.STAGE);
+            }
         }
     }
 
@@ -182,6 +189,24 @@ public class Claw extends FullSubsystem implements SimulatedMechanism {
 
     @Override
     public Pose3d getSimulatedPose() {
-        return new Pose3d(0,0,0, new Rotation3d(Rotations.zero(), inputs.pivotMotorPosition, Rotations.zero()));
+        return Pose3d.kZero.rotateBy(new Rotation3d(Rotations.zero(), inputs.pivotMotorPosition, Rotations.zero()));
+    }
+
+    private enum CubeState {
+        STAGE,
+        INTAKE;
+    }
+
+    private CubeState cubeState = CubeState.STAGE;
+
+    private void setCubeState(final CubeState cubeState) {
+        this.cubeState = cubeState;
+    }
+
+    public Pose3d getCubePose() {
+        return switch(this.cubeState) {
+            case STAGE -> Field.STAGING_POSE;
+            case INTAKE -> Pose3d.kZero;
+        };
     }
 }

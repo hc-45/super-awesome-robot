@@ -23,7 +23,7 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import org.littletonrobotics.junction.Logger;
 
 // intentioanlly package private
-sealed abstract class ElevatorIOBase implements ElevatorIO permits ElevatorIOSim, ElevatorIOTalonFX {
+abstract class ElevatorIOBase implements ElevatorIO {
     private final TalonFX TRMotor; // top right (leader)
     private final TalonFX BRMotor; // bottom right
     private final TalonFX BLMotor; // bottom left

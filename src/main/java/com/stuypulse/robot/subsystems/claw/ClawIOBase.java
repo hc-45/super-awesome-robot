@@ -17,7 +17,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 // intentionally package private
-sealed abstract class ClawIOBase implements ClawIO permits ClawIOSim, ClawIOTalonFX {
+abstract class ClawIOBase implements ClawIO {
     private final TalonFX rollerMotor;
     private final TalonFX pivotMotor;
 

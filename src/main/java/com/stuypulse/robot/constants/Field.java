@@ -9,7 +9,9 @@ import static org.wpilib.units.Units.*;
 import com.stuypulse.robot.Robot;
 
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.units.measure.Distance;
@@ -34,6 +36,9 @@ public interface Field {
     Pose2d LEFT_SWITCH_CENTER = new Pose2d(Inches.of(42.0), Inches.of(147.47), new Rotation2d());
     Pose2d RIGHT_SWITCH_CENTER = new Pose2d(Inches.of(42.0), Inches.of(147.47 - 23.5 - 10), new Rotation2d());
     Distance SWITCH_WIDTH_LENGTH = Inches.of(6.7);
+
+
+    Pose3d STAGING_POSE = new Pose3d(10, 10, 10, Rotation3d.kZero);
 
     public static Pose2d transformToOppositeAlliance(Pose2d pose) {
         Pose2d rotated = pose.rotateBy(Rotation2d.fromDegrees(180));

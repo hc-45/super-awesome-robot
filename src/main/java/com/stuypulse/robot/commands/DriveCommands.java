@@ -8,12 +8,18 @@ import static org.wpilib.units.Units.Seconds;
 
 import com.stuypulse.robot.constants.Field;
 import com.stuypulse.robot.constants.Field.Target;
+import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.constants.GlobalSettings.DriveGains;
 import com.stuypulse.robot.constants.GlobalSettings.DriveSettings;
 import com.stuypulse.robot.constants.GlobalSettings.DriverConstants;
+import com.stuypulse.robot.constants.GlobalSettings.DriverConstants.Driving;
+import com.stuypulse.robot.constants.GlobalSettings.DriverConstants.Turning;
 import com.stuypulse.robot.subsystems.swerve.Drive;
+import com.stuypulse.robot.util.swerveinput.DriveInputProcessor;
+import com.stuypulse.robot.util.swerveinput.DriveTurnInputProcessor;
 
 import org.wpilib.command3.*;
+import org.wpilib.command3.button.CommandGamepad;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.math.controller.PIDController;
@@ -99,9 +105,95 @@ public interface DriveCommands {
         return new Rotation2d((atan));
     }
 
+    // public static Translation2d getLinearVelocityFromJoysticks(double x, double
+    // y) {
+    // // Apply deadband
+    // double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y),
+    // DriverConstants.Driving.DEADBAND);
+    // Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
+
+    // // Square magnitude for more precise control
+    // linearMagnitude = linearMagnitude * linearMagnitude;
+
+    // // Return new linear velocity
+    // return new Pose2d(new Translation2d(), linearDirection)
+    // .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+    // .getTranslation();
+    // }
+
+    /**
+     * Field relative drive command using two joysticks (controlling linear and
+     * angular velocities).
+     */
+    // public static Command joystickDrive(
+    // Drive drive,
+    // DoubleSupplier xSupplier,
+    // DoubleSupplier ySupplier,
+    // DoubleSupplier omegaSupplier) {
+    // return drive
+    // .run(
+    // coroutine -> {
+    // // Get linear velocity
+    // Translation2d linearVelocity =
+    // getLinearVelocityFromJoysticks(xSupplier.getAsDouble(),
+    // ySupplier.getAsDouble());
+
+    // // Apply rotation deadband
+    // double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(),
+    // DriverConstants.Driving.DEADBAND);
+
+    // // Square rotation value for more precise control
+    // omega = Math.copySign(omega * omega, omega);
+
+    // // Convert to field relative speeds & send command
+    // ChassisVelocities speeds = new ChassisVelocities(
+    // linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+    // linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+    // omega * drive.getMaxAngularSpeedRadPerSec());
+    // boolean isFlipped = MatchState.getAlliance().isPresent()
+    // && MatchState.getAlliance().get() == Alliance.RED;
+    // drive.runVelocity(
+    // speeds.toFieldRelative(
+    // isFlipped
+    // ? drive.getRotation().plus(new Rotation2d(Math.PI))
+    // : drive.getRotation()));
+    // })
+    // .named("Joystick Drive");
+    // }
+
+    // public static Command drive(Drive drive, CommandGamepad joystick) {
+    // final DriveInputProcessor speed = new DriveInputProcessor(
+    // joystick,
+    // DriverConstants.Driving.DEADBAND,
+    // DriverConstants.Driving.POWER,
+    // GlobalSettings.DriveSettings.Constraints.MAX_VELOCITY,
+    // GlobalSettings.DriveSettings.Constraints.MAX_ACCEL,
+    // Driving.RC);
+    // final DriveTurnInputProcessor turn = new DriveTurnInputProcessor(
+    // joystick,
+    // Turning.DEADBAND,
+    // Turning.POWER,
+    // DriveSettings.Constraints.MAX_ANGULAR_VELOCITY, Turning.RC);
+    // return drive.run(coroutine -> {
+    // while (true) {
+    // speed.update();
+    // turn.update();
+
+    // ChassisVelocities fieldRelative = new ChassisVelocities(
+    // speed.get().getX(),
+    // speed.get().getY(),
+    // -turn.get());
+
+    // drive.runVelocity(fieldRelative.toRobotRelative(drive.getRotation()));
+
+    // coroutine.yield();
+    // }
+    // }).named("FixedDriveCommand");
+    // }
     public static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
         // Apply deadband
-        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DriverConstants.DEADBAND);
+        double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y),
+                DriverConstants.Driving.DEADBAND);
         Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
         // Square magnitude for more precise control
@@ -125,28 +217,33 @@ public interface DriveCommands {
         return drive
                 .run(
                         coroutine -> {
-                            // Get linear velocity
-                            Translation2d linearVelocity = getLinearVelocityFromJoysticks(xSupplier.getAsDouble(),
-                                    ySupplier.getAsDouble());
+                            while (true) {
+                                // Get linear velocity
+                                Translation2d linearVelocity = getLinearVelocityFromJoysticks(
+                                        xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-                            // Apply rotation deadband
-                            double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DriverConstants.DEADBAND);
+                                // Apply rotation deadband
+                                double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(),
+                                        DriverConstants.Driving.DEADBAND);
 
-                            // Square rotation value for more precise control
-                            omega = Math.copySign(omega * omega, omega);
+                                // Square rotation value for more precise control
+                                omega = Math.copySign(omega * omega, omega);
 
-                            // Convert to field relative speeds & send command
-                            ChassisVelocities speeds = new ChassisVelocities(
-                                    linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                                    linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                                    omega * drive.getMaxAngularSpeedRadPerSec());
-                            boolean isFlipped = MatchState.getAlliance().isPresent()
-                                    && MatchState.getAlliance().get() == Alliance.RED;
-                            drive.runVelocity(
-                                    speeds.toFieldRelative(
-                                            isFlipped
-                                                    ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                                                    : drive.getRotation()));
+                                // Convert to field relative speeds & send command
+                                ChassisVelocities speeds = new ChassisVelocities(
+                                        linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                                        linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                                        omega * drive.getMaxAngularSpeedRadPerSec());
+                                boolean isFlipped = MatchState.getAlliance().isPresent()
+                                        && MatchState.getAlliance().get() == Alliance.RED;
+                                drive.runVelocity(
+                                        speeds.toRobotRelative(
+                                                isFlipped
+                                                        ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                                                        : drive.getRotation()));
+
+                                coroutine.yield();
+                            }
                         })
                 .named("Joystick Drive");
     }

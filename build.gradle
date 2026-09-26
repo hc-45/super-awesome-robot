@@ -33,6 +33,7 @@ deploy {
 
                 wpilibJava(getArtifactTypeClass('WPILibJavaArtifact')) {
                     jvmArgs.add("-XX:+UseZGC")
+                    jvmArgs.add("-XX:+UseCompactObjectHeaders")
                 }
 
                 // Static files artifact
