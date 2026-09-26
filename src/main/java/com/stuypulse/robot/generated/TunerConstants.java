@@ -1,16 +1,15 @@
-/************************ PROJECT TRIBECBOT *************************/
-/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved. */
-/* Use of this source code is governed by an MIT-style license */
-/* that can be found in the repository LICENSE file.           */
-/***************************************************************/
+/**************** PROJECT SUPER AWESOME ROBOT *****************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.generated;
 
 import static org.wpilib.units.Units.*;
-import org.wpilib.units.measure.*;
 
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
+import org.wpilib.units.measure.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.*;

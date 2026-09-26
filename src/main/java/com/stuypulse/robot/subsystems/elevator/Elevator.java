@@ -37,7 +37,8 @@ public class Elevator extends FullSubsystem implements SimulatedMechanism {
         this.state = ElevatorState.IDLE;
     }
 
-    enum ElevatorState {
+    // INTERNAL STATE HANDLING
+    private enum ElevatorState {
         IDLE,
         DOWN,
         SWITCH,
@@ -52,29 +53,41 @@ public class Elevator extends FullSubsystem implements SimulatedMechanism {
         return run(coroutine -> setState(state)).named(getName() + "Set" + state.name());
     }
 
-    private final Command idleCommand = commandState(ElevatorState.IDLE);
-    private final Command downCommand = commandState(ElevatorState.DOWN);
-    private final Command switchCommand = commandState(ElevatorState.SWITCH);
-    private final Command scaleCommand = commandState(ElevatorState.SCALE);
+    // EXPOSED COMMANDS
 
-    // Exposed commands
+    /**
+     * Command the elevator to the {@link ElevatorState#IDLE} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandIdleState() {
-        return idleCommand;
+        return this.commandState(ElevatorState.IDLE);
     }
 
+    /**
+     * Command the elevator to the {@link ElevatorState#DOWN} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandDownState() {
-        return downCommand;
+        return this.commandState(ElevatorState.DOWN);
     }
 
+    /**
+     * Command the elevator to the {@link ElevatorState#SWITCH} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandSwitchState() {
-        return switchCommand;
+        return this.commandState(ElevatorState.SWITCH);
     }
 
+    /**
+     * Command the elevator to the {@link ElevatorState#SCALE} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandScaleState() {
-        return scaleCommand;
+        return this.commandState(ElevatorState.SCALE);
     }
 
-    // Exposed inputs
+    // EXPOSED INPUTS
 
     public boolean isAtScale() {
         return inputs.TRMotorPosition.isNear(ElevatorSettings.SCALE_ANGLE, ElevatorSettings.SCALE_TOLERANCE) && inputs.TRMotorMotionMagicAtTarget; // kinda sus lock in
@@ -84,7 +97,7 @@ public class Elevator extends FullSubsystem implements SimulatedMechanism {
         return inputs.TRMotorPosition.isNear(ElevatorSettings.SWITCH_ANGLE, ElevatorSettings.SWITCH_TOLERANCE) && inputs.TRMotorMotionMagicAtTarget; // kinda sus lock in
     }
 
-    // Output Control
+    // OUTPUT CONTROL
     private void runIdle() {
         this.outputs.outputMode = ElevatorOutputMode.IDLE;
     }

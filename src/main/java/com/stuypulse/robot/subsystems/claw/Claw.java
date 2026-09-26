@@ -46,7 +46,7 @@ public class Claw extends FullSubsystem implements SimulatedMechanism {
         this.rollerState = RollerState.IDLE;
     }
 
-    // STATE
+    // INTERNAL STATES HANDLING
     private enum PivotState {
         /** Pivot stopped wherever it is **/
         IDLE,
@@ -75,58 +75,84 @@ public class Claw extends FullSubsystem implements SimulatedMechanism {
         this.rollerState = state;
     }
 
-    // INTERNAL COMMANDS
     private Command commandPivotState(final PivotState state) {
         return run(coroutine -> setPivotState(state)).named(getName() + "PivotSet" + state.name());
     }
-
-    private final Command pivotIdleCommand = commandPivotState(PivotState.IDLE);
-    private final Command pivotIntakeCommand = commandPivotState(PivotState.INTAKE);
-    private final Command pivotHeldCommand = commandPivotState(PivotState.HELD);
-    private final Command pivotOuttakeCommand = commandPivotState(PivotState.OUTTAKE);
 
     private Command commandRollerState(final RollerState state) {
         return run(coroutine -> setRollerState(state)).named(getName() + "RollerSet" + state.name());
     }
 
-    private final Command rollerIdleCommand = commandRollerState(RollerState.IDLE);
-    private final Command rollerIntakeCommand = commandRollerState(RollerState.INTAKE);
-    private final Command rollerOuttakeCommand = commandRollerState(RollerState.OUTTAKE);
-
     // EXPOSED COMMANDS
+
+    /**
+     * Command the pivot to the {@link PivotState#IDLE} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandPivotIdleState() {
-        return pivotIdleCommand;
+        return this.commandPivotState(PivotState.IDLE);
     }
 
+    /**
+     * Command the pivot to the {@link PivotState#INTAKE} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandPivotIntakeState() {
-        return pivotIntakeCommand;
+        return this.commandPivotState(PivotState.INTAKE);
     }
 
+    /**
+     * Command the pivot to the {@link PivotState#HELD} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandPivotHeldState() {
-        return pivotHeldCommand;
+        return this.commandPivotState(PivotState.HELD);
     }
 
+    /**
+     * Command the pivot to the {@link PivotState#OUTTAKE} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandPivotOuttakeState() {
-        return pivotOuttakeCommand;
+        return this.commandPivotState(PivotState.OUTTAKE);
     }
 
+    /**
+     * Command the rollers to the {@link RollerState#IDLE} state
+     * @return Command to orchestrate the target state
+     */
     public Command comandRollerIdleState() {
-        return rollerIdleCommand;
+        return this.commandRollerState(RollerState.IDLE);
     }
 
+    /**
+     * Command the rollers to the {@link RollerState#INTAKE} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandRollerIntakeState() {
-        return rollerIntakeCommand;
+        return this.commandRollerState(RollerState.INTAKE);
     }
 
+    /**
+     * Command the rollers to the {@link RollerState#OUTTAKE} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandRollerOuttakeState() {
-        return rollerOuttakeCommand;
+        return this.commandRollerState(RollerState.OUTTAKE);
     }
 
     // EXPOSED INPUTS
+
+    /**
+     * @return Whether the pivot is at the deployed angle or not
+     */
     public boolean isInDeployedPosition() {
         return inputs.pivotMotorPosition.gt(ClawSettings.Pivot.DEPLOYED_THRESHOLD) && inputs.pivotMotorMotionMagicAtTarget; // kinda sus lock in
     }
 
+    /**
+     * @return Whether the pivot is at the held angle or not
+     */
     public boolean isInHeldPosition() {
         return inputs.pivotMotorPosition.lt(ClawSettings.Pivot.HELD_THRESHOLD) && inputs.pivotMotorMotionMagicAtTarget; // kinda sus lock in
     }
@@ -187,6 +213,7 @@ public class Claw extends FullSubsystem implements SimulatedMechanism {
         io.applyRollerOutputs(rollerOutputs);
     }
 
+    // SIMULATION
     @Override
     public Pose3d getSimulatedPose() {
         return Pose3d.kZero.rotateBy(new Rotation3d(Rotations.zero(), inputs.pivotMotorPosition, Rotations.zero()));
