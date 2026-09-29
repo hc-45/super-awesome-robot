@@ -16,7 +16,7 @@ import org.wpilib.units.measure.Angle;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class BuddyClimb extends FullSubsystem {
+public class BuddyClimb extends FullSubsystem { // not simulated
     private final BuddyIO io;
     private final BuddyClimbInputsAutoLogged inputs;
     private final BuddyClimbOutputs outputs;
@@ -33,6 +33,7 @@ public class BuddyClimb extends FullSubsystem {
         this.state = BuddyClimbState.RETRACT;
     }
 
+    // INTERNAL STATE HANDLING
     enum BuddyClimbState {
         /** Braked wherever it is */
         STOP,
@@ -45,25 +46,34 @@ public class BuddyClimb extends FullSubsystem {
     private void setState(final BuddyClimbState state) {
         this.state = state;
     }
-
     private Command commandState(final BuddyClimbState state) {
         return run(coroutine -> setState(state)).named(getName() + "Set" + state.name());
     }
 
-    private final Command stopCommand = commandState(BuddyClimbState.DEPLOY);
-    private final Command retractCommand = commandState(BuddyClimbState.RETRACT);
-    private final Command deployCommand = commandState(BuddyClimbState.DEPLOY);
+    // EXPOSED COMMANDS
 
+    /**
+     * Command the buddy climb to the {@link BuddyClimbState#STOP} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandStopState() {
-        return stopCommand;
+        return this.commandState(BuddyClimbState.STOP);
     }
 
+    /**
+     * Command the buddy climb to the {@link BuddyClimbState#RETRACT} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandRetractState() {
-        return retractCommand;
+        return this.commandState(BuddyClimbState.RETRACT);
     }
 
+    /**
+     * Command the buddy climb to the {@link BuddyClimbState#DEPLOY} state
+     * @return Command to orchestrate the target state
+     */
     public Command commandDeployState() {
-        return deployCommand;
+        return this.commandState(BuddyClimbState.DEPLOY);
     }
 
     // OUTPUT CONTROL
@@ -75,6 +85,7 @@ public class BuddyClimb extends FullSubsystem {
         this.outputs.outputMode = BuddyClimbOutputMode.POSITION_VOLTAGE;
         this.outputs.targetPosition = targetPosition;
     }
+
     @Override
     protected void periodic() {
         io.updateInputs(inputs);

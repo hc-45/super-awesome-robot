@@ -8,18 +8,12 @@ import static org.wpilib.units.Units.Seconds;
 
 import com.stuypulse.robot.constants.Field;
 import com.stuypulse.robot.constants.Field.Target;
-import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.constants.GlobalSettings.DriveGains;
 import com.stuypulse.robot.constants.GlobalSettings.DriveSettings;
 import com.stuypulse.robot.constants.GlobalSettings.DriverConstants;
-import com.stuypulse.robot.constants.GlobalSettings.DriverConstants.Driving;
-import com.stuypulse.robot.constants.GlobalSettings.DriverConstants.Turning;
 import com.stuypulse.robot.subsystems.swerve.Drive;
-import com.stuypulse.robot.util.swerveinput.DriveInputProcessor;
-import com.stuypulse.robot.util.swerveinput.DriveTurnInputProcessor;
 
 import org.wpilib.command3.*;
-import org.wpilib.command3.button.CommandGamepad;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.math.controller.PIDController;
