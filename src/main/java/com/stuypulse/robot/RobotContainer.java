@@ -7,6 +7,7 @@ package com.stuypulse.robot;
 import com.stuypulse.robot.commands.CompoundCommands;
 import com.stuypulse.robot.commands.DriveCommands;
 import com.stuypulse.robot.commands.auton.AutonomousRoutines;
+import com.stuypulse.robot.commands.subsystems.ClawCommands;
 import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.constants.GlobalSettings.VisionMode;
@@ -174,9 +175,9 @@ public class RobotContainer {
     private void configureButtonBindings() {
         DRIVER.b().whileTrue(CompoundCommands.alignToScoreScale(drive, elevator, claw));
         DRIVER.leftBumper().whileTrue(CompoundCommands.alignToScoreSwitch(drive, elevator, claw));
-        DRIVER.x().whileTrue(CompoundCommands.outtakeIntakeSide(claw));
-        DRIVER.rightBumper().whileTrue(CompoundCommands.outtakeElevatorSide(claw));
-        DRIVER.a().onTrue(CompoundCommands.intake(claw));
+        DRIVER.x().whileTrue(ClawCommands.outtakeIntakeSide(claw));
+        DRIVER.rightBumper().whileTrue(ClawCommands.outtakeElevatorSide(claw));
+        DRIVER.a().onTrue(ClawCommands.intake(claw));
     }
 
     /**************/
